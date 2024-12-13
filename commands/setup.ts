@@ -1,7 +1,7 @@
 // import { prompt } from "../prompt.ts"
-
+import { Spinner } from "@std/cli/unstable-spinner"
 import { Ask } from "@sallai/ask"
-const ask = new Ask() 
+const ask = new Ask()
 
 import { btpIntegration } from "./modules/btp_integration.ts"
 import { odataConnector } from "./modules/odata_connector.ts"
@@ -25,7 +25,7 @@ const sapIntegrationModules = [
 ]
 
 export const setupCommand = {
-  command: "setup <camunda> <deployment> <module>",
+  command: "setup [camunda] [deployment] [module]",
   describe: "prepare one of Camunda's SAP Integration modules for deployment",
   builder: (yargs) => {
     return yargs
@@ -52,7 +52,6 @@ export const setupCommand = {
       })
   },
   handler: async (argv) => {
-    console.log("//> setupCommand.handler", argv)
     const camundaVersion = argv.camunda ||
       (await ask.select({
         name: "camunda",
@@ -75,9 +74,10 @@ export const setupCommand = {
         choices: sapIntegrationModules,
       })).module
 
-    console.log(`Selected Camunda version: ${camundaVersion}`)
-    console.log(`Selected deployment option: ${camundaDeployment}`)
-    console.log(`Selected SAP integration module: ${sapIntegrationModule}`)
+    const spinner = new Spinner({ color: "yellow" })
+    spinner.message =
+      `Setting up ${sapIntegrationModule} for Camunda ${camundaVersion} ${camundaDeployment}...`
+    spinner.start()
 
     switch (sapIntegrationModule) {
       case "BTP integration":
@@ -93,5 +93,8 @@ export const setupCommand = {
         console.error("invalid SAP integration module selected")
         Deno.exit(1)
     }
+    await new Promise((resolve) => setTimeout(resolve, 3000))
+    spinner.stop()
+    console.log(`\n👍 %csetup complete for ${sapIntegrationModule}!\n`, "color: green")
   },
 }
