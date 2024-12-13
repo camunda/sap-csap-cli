@@ -5,7 +5,8 @@
     "proseWrap": "preserve"
   },
   "imports": {
-    "@sallai/ask": "jsr:@sallai/ask@^2.0.2"
+    "@sallai/ask": "jsr:@sallai/ask@^2.0.2",
+    "@std/cli": "jsr:@std/cli@^1.0.8"
   },
   "version": "1.0.0"
 }

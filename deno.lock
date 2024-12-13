@@ -2,7 +2,8 @@
   "version": "4",
   "specifiers": {
     "jsr:@sallai/ask@^2.0.2": "2.0.2",
-    "jsr:@sallai/iro@^1.0.3": "1.0.4"
+    "jsr:@sallai/iro@^1.0.3": "1.0.4",
+    "jsr:@std/cli@^1.0.8": "1.0.8"
   },
   "jsr": {
     "@sallai/ask@2.0.2": {
@@ -13,6 +14,9 @@
     },
     "@sallai/iro@1.0.4": {
       "integrity": "e14f39c7b80e80994788a8542b2c4983554fd4bb6d2f2a09471327f9cf37ee36"
+    },
+    "@std/cli@1.0.8": {
+      "integrity": "3762d8dc9a373715c08d871c38d45e637b25266f013a1d0bbe560bca409de94e"
     }
   },
   "redirects": {
@@ -170,7 +174,8 @@
   },
   "workspace": {
     "dependencies": [
-      "jsr:@sallai/ask@^2.0.2"
+      "jsr:@sallai/ask@^2.0.2",
+      "jsr:@std/cli@^1.0.8"
     ]
   }
 }
