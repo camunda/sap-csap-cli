@@ -7,12 +7,7 @@ import { rfcConnector } from "./modules/rfc_connector.ts"
 export const setupCommand = {
   command: "setup",
   describe: "Set up Camunda options",
-  //   builder: (yargs) => yargs.default('value', 'true'),
   builder: (yargs) => {
-    // return yargs.option('u', {
-    //     alias: 'url',
-    //     describe: 'the URL to make an HTTP request to'
-    //   })
     return yargs
       .positional("version", {
         alias: "v",
