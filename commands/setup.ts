@@ -25,8 +25,8 @@ const sapIntegrationModules = [
 ]
 
 export const setupCommand = {
-  command: "setup",
-  describe: "Set up Camunda options",
+  command: "setup <camunda> <deployment> <module>",
+  describe: "prepare one of Camunda's SAP Integration modules for deployment",
   builder: (yargs) => {
     return yargs
       .positional("camunda", {
