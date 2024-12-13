@@ -3,5 +3,9 @@
     "semiColons": false,
     "singleQuote": false,
     "proseWrap": "preserve"
-  }
+  },
+  "imports": {
+    "@sallai/ask": "jsr:@sallai/ask@^2.0.2"
+  },
+  "version": "1.0.0"
 }

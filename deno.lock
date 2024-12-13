@@ -1,5 +1,20 @@
 {
   "version": "4",
+  "specifiers": {
+    "jsr:@sallai/ask@^2.0.2": "2.0.2",
+    "jsr:@sallai/iro@^1.0.3": "1.0.4"
+  },
+  "jsr": {
+    "@sallai/ask@2.0.2": {
+      "integrity": "8a1d3cfe5f5a1d4b1e66412c7537f8879b8e70b949076ae9d2e05cff4a82ab42",
+      "dependencies": [
+        "jsr:@sallai/iro"
+      ]
+    },
+    "@sallai/iro@1.0.4": {
+      "integrity": "e14f39c7b80e80994788a8542b2c4983554fd4bb6d2f2a09471327f9cf37ee36"
+    }
+  },
   "redirects": {
     "https://deno.land/std/fmt/printf.ts": "https://deno.land/std@0.224.0/fmt/printf.ts",
     "https://deno.land/std/path/mod.ts": "https://deno.land/std@0.224.0/path/mod.ts",
@@ -152,5 +167,10 @@
     "https://deno.land/x/yargs_parser@v20.2.4-deno/build/lib/tokenize-arg-string.js": "7e0875b11795b8e217386e45f14b24a6e501ebbc62e15aa469aa8829d4d0ee61",
     "https://deno.land/x/yargs_parser@v20.2.4-deno/build/lib/yargs-parser.js": "453200a7dfbb002e605d8009b7dad30f2b1d93665e046ab89c073a4fe63dfd48",
     "https://deno.land/x/yargs_parser@v20.2.4-deno/deno.ts": "ad53c0c82c3982c4fc5be9472384b259e0a32ce1f7ae0f68de7b2445df5642fc"
+  },
+  "workspace": {
+    "dependencies": [
+      "jsr:@sallai/ask@^2.0.2"
+    ]
   }
 }

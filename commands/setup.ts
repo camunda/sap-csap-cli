@@ -1,49 +1,85 @@
-import { prompt } from "../prompt.ts"
+// import { prompt } from "../prompt.ts"
+
+import { Ask } from "@sallai/ask"
+const ask = new Ask() 
 
 import { btpIntegration } from "./modules/btp_integration.ts"
 import { odataConnector } from "./modules/odata_connector.ts"
 import { rfcConnector } from "./modules/rfc_connector.ts"
+
+const camundaVersions = [
+  { message: "8.7", value: "8.7" },
+  { message: "8.6", value: "8.6" },
+  { message: "8.5", value: "8.5" },
+]
+
+const camundaDeploymentOptions = [
+  { message: "SaaS", value: "SaaS" },
+  { message: "Self Managed", value: "SM", disabled: true },
+]
+
+const sapIntegrationModules = [
+  { message: "BTP integration", value: "BTP integration" },
+  { message: "OData connector", value: "OData connector" },
+  { message: "RFC connector", value: "RFC connector" },
+]
 
 export const setupCommand = {
   command: "setup",
   describe: "Set up Camunda options",
   builder: (yargs) => {
     return yargs
-      .positional("version", {
-        alias: "v",
+      .positional("camunda", {
+        alias: "c",
         type: "string",
         description: "Camunda version",
-        choices: ["8.7", "8.6", "8.5"],
+        choices: camundaVersions.map((v) => v.value),
       })
       .positional("deployment", {
         alias: "d",
         type: "string",
         description: "Camunda deployment option",
-        choices: ["SaaS"], // 'Self-Managed' option deactivated
+        // should be...
+        // choices: camundaDeploymentOptions.map(d => d.value),
+        // ...but isn't until SM is available in the SAP integration context
+        choices: camundaDeploymentOptions.map((d) => d.value),
       })
       .positional("module", {
         alias: "m",
         type: "string",
         description: "SAP integration module",
-        choices: ["BTP integration", "OData connector", "RFC connector"],
+        choices: sapIntegrationModules.map((m) => m.value),
       })
   },
   handler: async (argv) => {
-    const version = argv.version ||
-      await prompt("Camunda version (8.7, 8.6, 8.5) [8.7]: ", "8.7")
-    const deployment = argv.deployment ||
-      await prompt("Deployment option (SaaS) [SaaS]: ", "SaaS")
-    const module = argv.module ||
-      await prompt(
-        "SAP integration module (BTP integration, OData connector, RFC connector) [OData connector]: ",
-        "OData connector",
-      )
+    console.log("//> setupCommand.handler", argv)
+    const camundaVersion = argv.camunda ||
+      (await ask.select({
+        name: "camunda",
+        message: "Camunda version",
+        default: camundaVersions[0].value,
+        choices: camundaVersions,
+      })).camunda //> b/c .select() returns an object like { $name: "8.7" }
+    const camundaDeployment = argv.deployment ||
+      (await ask.select({
+        name: "deployment",
+        message: "Deployment option",
+        default: camundaDeploymentOptions[0].value,
+        choices: camundaDeploymentOptions,
+      })).deployment
+    const sapIntegrationModule = argv.module ||
+      (await ask.select({
+        name: "module",
+        message: "SAP integration module",
+        default: sapIntegrationModules[1].value,
+        choices: sapIntegrationModules,
+      })).module
 
-    console.log(`Selected Camunda version: ${version}`)
-    console.log(`Selected deployment option: ${deployment}`)
-    console.log(`Selected SAP integration module: ${module}`)
+    console.log(`Selected Camunda version: ${camundaVersion}`)
+    console.log(`Selected deployment option: ${camundaDeployment}`)
+    console.log(`Selected SAP integration module: ${sapIntegrationModule}`)
 
-    switch (module) {
+    switch (sapIntegrationModule) {
       case "BTP integration":
         btpIntegration()
         break
@@ -54,7 +90,8 @@ export const setupCommand = {
         rfcConnector()
         break
       default:
-        console.log("Invalid module selected")
+        console.error("invalid SAP integration module selected")
+        Deno.exit(1)
     }
   },
 }

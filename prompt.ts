@@ -8,3 +8,4 @@ export async function prompt(
   const input = new TextDecoder().decode(buf.subarray(0, n)).trim()
   return input || defaultValue || ""
 }
+
