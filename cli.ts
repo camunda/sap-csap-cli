@@ -2,7 +2,8 @@ import yargs from "https://deno.land/x/yargs/deno.ts"
 import { setupCommand } from "./commands/setup.ts"
 
 console.log(
-  "Welcome to csap - Camunda’s SAP Integration CLI",
+  `
+Welcome to csap - Camunda’s SAP Integration CLI`,
 )
 console.log("https://docs.camunda.io/docs/components/camunda-integrations/sap/csap-cli.md")
 console.log(

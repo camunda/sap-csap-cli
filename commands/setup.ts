@@ -1,49 +1,18 @@
-import { Spinner } from "@std/cli/unstable-spinner"
 import { Ask } from "@sallai/ask"
 const ask = new Ask()
 
-import { btpIntegration } from "./modules/btp_integration.ts"
+import { btpPlugin } from "./modules/btp_plugin.ts"
 import { odataConnector } from "./modules/odata_connector.ts"
 import { rfcConnector } from "./modules/rfc_connector.ts"
+import { camundaVersions, camundaDeploymentOptions, sapIntegrationModules } from "./modules/common.ts"
+import { YargsInstance } from "https://deno.land/x/yargs@v17.7.2-deno/build/lib/yargs-factory.js"
 
-const camundaVersions = [
-  { message: "8.7", value: "8.7" },
-  { message: "8.6", value: "8.6" },
-  { message: "8.5", value: "8.5" },
-]
 
-const camundaDeploymentOptions = [
-  { message: "SaaS", value: "SaaS" },
-  { message: "Self Managed", value: "SM", disabled: true },
-]
-
-const sapIntegrationModules = [
-  {
-    message: "BTP plugin",
-    value: "btp-plugin",
-    description: "Render tasks forms in Fiori, provide BTP integration",
-  },
-  {
-    message: "OData connector",
-    value: "odata",
-    description: "Interact with S/4HANA or ECC System from a BPMN model",
-  },
-  {
-    message: "RFC connector",
-    value: "rfc",
-    description: "\tQuery BAPIs & Remote Function Modules on SAP ECC systems",
-  },
-  {
-    message: "All modules",
-    value: "all",
-    description: "Configure all modules",
-  },
-]
 
 export const setupCommand = {
   command: "setup [for] [camunda] [deployment]",
   describe: "prepare one of Camunda's SAP Integration modules for deployment",
-  builder: (yargs) => {
+  builder: (yargs: YargsInstance) => {
     return yargs
       .option("for", {
         type: "string",
@@ -88,16 +57,11 @@ export const setupCommand = {
         choices: camundaDeploymentOptions,
       })).deployment
 
-    const spinner = new Spinner({ color: "yellow" })
-    spinner.message = `Setting up ${
-      sapIntegrationModules.find((m) => m.value === sapIntegrationModule)
-        ?.message
-    } for Camunda ${camundaVersion} ${camundaDeployment}...`
-    spinner.start()
+
 
     switch (sapIntegrationModule) {
       case "btp-plugin":
-        btpIntegration()
+        await btpPlugin({ sapIntegrationModule, camundaVersion, camundaDeployment })
         break
       case "odata":
         odataConnector()
@@ -109,8 +73,7 @@ export const setupCommand = {
         console.error("invalid SAP integration module selected")
         Deno.exit(1)
     }
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-    spinner.stop()
+   
     console.log(
       `\n%c✔ Setup completed successfully`,
       "color: green",
