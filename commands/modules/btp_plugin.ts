@@ -16,6 +16,8 @@ export async function btpPlugin(
 }
 
 async function downloadSources() {
+  // TODO: check if already downloaded
+
   const step1 = step("Downloading BTP plugin sources...")
   step1.start()
   await new Promise((resolve) => setTimeout(resolve, 2200))
