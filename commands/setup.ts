@@ -1,4 +1,3 @@
-// import { prompt } from "../prompt.ts"
 import { Spinner } from "@std/cli/unstable-spinner"
 import { Ask } from "@sallai/ask"
 const ask = new Ask()
@@ -19,24 +18,43 @@ const camundaDeploymentOptions = [
 ]
 
 const sapIntegrationModules = [
-  { message: "BTP integration", value: "BTP integration" },
-  { message: "OData connector", value: "OData connector" },
-  { message: "RFC connector", value: "RFC connector" },
+  {
+    message: "BTP plugin",
+    value: "btp-plugin",
+    description: "Render tasks forms in Fiori, provide BTP integration",
+  },
+  {
+    message: "OData connector",
+    value: "odata",
+    description: "Interact with S/4HANA or ECC System from a BPMN model",
+  },
+  {
+    message: "RFC connector",
+    value: "rfc",
+    description: "\tQuery BAPIs & Remote Function Modules on SAP ECC systems",
+  },
+  {
+    message: "All modules",
+    value: "all",
+    description: "Configure all modules",
+  },
 ]
 
 export const setupCommand = {
-  command: "setup [camunda] [deployment] [module]",
+  command: "setup [for] [camunda] [deployment]",
   describe: "prepare one of Camunda's SAP Integration modules for deployment",
   builder: (yargs) => {
     return yargs
-      .positional("camunda", {
-        alias: "c",
+      .option("for", {
+        type: "string",
+        description: "SAP integration module",
+        choices: sapIntegrationModules.map((m) => m.value),
+      }).option("camunda", {
         type: "string",
         description: "Camunda version",
         choices: camundaVersions.map((v) => v.value),
       })
-      .positional("deployment", {
-        alias: "d",
+      .option("deployment", {
         type: "string",
         description: "Camunda deployment option",
         // should be...
@@ -44,14 +62,17 @@ export const setupCommand = {
         // ...but isn't until SM is available in the SAP integration context
         choices: camundaDeploymentOptions.map((d) => d.value),
       })
-      .positional("module", {
-        alias: "m",
-        type: "string",
-        description: "SAP integration module",
-        choices: sapIntegrationModules.map((m) => m.value),
-      })
   },
   handler: async (argv) => {
+    const sapIntegrationModule = argv.for ||
+      (await ask.select({
+        name: "for",
+        message: "SAP integration module",
+        default: sapIntegrationModules[1].value,
+        // REVISIT: this has usability issues on smaller terminals
+        // choices: sapIntegrationModules.map(m => ({ message: m.message + "\t" + m.description, value: m.value })),
+        choices: sapIntegrationModules,
+      })).for
     const camundaVersion = argv.camunda ||
       (await ask.select({
         name: "camunda",
@@ -66,35 +87,33 @@ export const setupCommand = {
         default: camundaDeploymentOptions[0].value,
         choices: camundaDeploymentOptions,
       })).deployment
-    const sapIntegrationModule = argv.module ||
-      (await ask.select({
-        name: "module",
-        message: "SAP integration module",
-        default: sapIntegrationModules[1].value,
-        choices: sapIntegrationModules,
-      })).module
 
     const spinner = new Spinner({ color: "yellow" })
-    spinner.message =
-      `Setting up ${sapIntegrationModule} for Camunda ${camundaVersion} ${camundaDeployment}...`
+    spinner.message = `Setting up ${
+      sapIntegrationModules.find((m) => m.value === sapIntegrationModule)
+        ?.message
+    } for Camunda ${camundaVersion} ${camundaDeployment}...`
     spinner.start()
 
     switch (sapIntegrationModule) {
-      case "BTP integration":
+      case "btp-plugin":
         btpIntegration()
         break
-      case "OData connector":
+      case "odata":
         odataConnector()
         break
-      case "RFC connector":
+      case "rfc":
         rfcConnector()
         break
       default:
         console.error("invalid SAP integration module selected")
         Deno.exit(1)
     }
-    await new Promise((resolve) => setTimeout(resolve, 3000))
+    await new Promise((resolve) => setTimeout(resolve, 1000))
     spinner.stop()
-    console.log(`\n👍 %csetup complete for ${sapIntegrationModule}!\n`, "color: green")
+    console.log(
+      `\n%c✔ Setup completed successfully`,
+      "color: green",
+    )
   },
 }
