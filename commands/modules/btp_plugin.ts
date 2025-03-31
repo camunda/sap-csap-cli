@@ -1,10 +1,11 @@
-import { progress, step } from "./common.ts"
+import { CamundaCredentials, CamundaCredentialsInEnv, progress, step } from "./common.ts"
 
 export async function btpPlugin(
-  { sapIntegrationModule, camundaVersion, camundaDeployment }: {
-    sapIntegrationModule: string
+  { camundaVersion, camundaDeployment, credentials, btpRoute }: {
     camundaVersion: string
-    camundaDeployment: string
+    camundaDeployment: string,
+    credentials: CamundaCredentials,
+    btpRoute: string
   },
 ) {
   const init = progress()
