@@ -1,15 +1,7 @@
-import { Ask } from "@sallai/ask"
-const ask = new Ask()
-
-import { btpPlugin } from "./modules/btp_plugin.ts"
-import { odataConnector } from "./modules/odata_connector.ts"
-import { rfcConnector } from "./modules/rfc_connector.ts"
+import { YargsInstance } from "https://deno.land/x/yargs@v17.7.2-deno/build/lib/yargs-factory.js"
 import {
   camundaDeploymentOptions,
   camundaVersions,
-  detectCredentials,
-  getCredentials,
-  getCredentialsFromEnv,
   sapIntegrationModules,
 } from "./modules/common.ts"
 import { setupHandler } from "./modules/setup-handler.ts"
