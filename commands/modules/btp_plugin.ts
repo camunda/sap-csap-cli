@@ -1,4 +1,5 @@
-import { CamundaCredentials, CamundaCredentialsInEnv, progress, step } from "./common.ts"
+import {progress, step } from "./common.ts"
+import { CamundaCredentials } from "./credentials.ts"
 
 export async function btpPlugin(
   { camundaVersion, camundaDeployment, credentials, btpRoute }: {
