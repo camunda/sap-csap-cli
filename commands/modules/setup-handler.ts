@@ -56,6 +56,7 @@ export async function setupHandler(argv) {
       })).btpRoute
     : "n/a"
 
+
   let clusterId, region, clientId, clientSecret
   if (
     argv.clusterId && argv.region && argv.clientId &&
@@ -69,7 +70,7 @@ export async function setupHandler(argv) {
       CAMUNDA_CLIENT_ID: clientId,
       CAMUNDA_CLIENT_SECRET: clientSecret,
     } = getCredentialsFromEnv())
-    console.log("\ni Camunda API credentials found in environment:")
+    console.log("\ni Camunda API credentials found in environment. Reusing")
     const log = Object.entries(getCredentialsFromEnv()).reduce(
       (acc, [key, value]) => {
         acc[key] = "***" + value.slice(-3)

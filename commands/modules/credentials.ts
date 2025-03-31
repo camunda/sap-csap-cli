@@ -17,6 +17,7 @@ export type CamundaCredentials = {
   clientId: string
   clientSecret: string
 }
+
 export function detectCredentials() {
   return allCamundaCredentials.every((key) => Deno.env.get(key) !== undefined)
 }
