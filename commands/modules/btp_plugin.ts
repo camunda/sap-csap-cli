@@ -8,6 +8,7 @@ export async function btpPlugin(
     btpRoute: string
   },
 ) {
+  console.log("")
   const init = progress()
   init.start()
   await new Promise((resolve) => setTimeout(resolve, 1000))
