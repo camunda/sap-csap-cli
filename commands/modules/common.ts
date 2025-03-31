@@ -1,5 +1,5 @@
 import { Spinner } from "@std/cli/unstable-spinner"
-import { createHash } from "https://deno.land/std@0.203.0/hash/mod.ts"
+import { crypto } from "jsr:@std/crypto"
 import process from "node:process"
 
 export function progress() {
@@ -66,9 +66,10 @@ export async function compareFilesBySha256(
 ): Promise<boolean> {
   const hashFile = async (filePath: string): Promise<string> => {
     const fileContent = await Deno.readFile(filePath)
-    const hash = createHash("sha256")
-    hash.update(fileContent)
-    return hash.toString()
+    const hashBuffer = await crypto.subtle.digest("SHA-256", fileContent)
+    return Array.from(new Uint8Array(hashBuffer))
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("")
   }
 
   const [hash1, hash2] = await Promise.all([
@@ -76,6 +77,15 @@ export async function compareFilesBySha256(
     hashFile(filePath2),
   ])
   return hash1 === hash2
+}
+
+export async function compareFilesByName(
+  filePath1: string,
+  filePath2: string,
+): Promise<boolean> {
+  const fileName1 = filePath1.split("/").pop()
+  const fileName2 = filePath2.split("/").pop()
+  return fileName1 === fileName2
 }
 
 export async function getGitCommitHash(
