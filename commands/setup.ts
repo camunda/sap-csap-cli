@@ -3,8 +3,8 @@ import {
   camundaDeploymentOptions,
   camundaVersions,
   sapIntegrationModules,
-} from "./modules/common.ts"
-import { setupHandler } from "./modules/setup-handler.ts"
+} from "../lib/common.ts"
+import { setupHandler } from "./setup-handler.ts"
 
 export const setupCommand = {
   command:
@@ -32,7 +32,7 @@ export const setupCommand = {
       .option("btpRoute", {
         type: "string",
         description:
-          "BTP route to reach the plugin (host name only!, e.g. camunda-app)",
+          "(only for 'btp-plugin') BTP route (hostname) to reach the plugin",
       })
       .option("clusterId", {
         type: "string",

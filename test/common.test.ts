@@ -1,4 +1,4 @@
-import { compareFilesBySha256, getGitCommitHash, compareFilesByName } from "../commands/modules/common.ts"
+import { compareFilesBySha256, getGitCommitHash, compareFilesByName } from "../lib/common.ts"
 import { assertEquals, assertNotEquals } from "jsr:@std/assert"
 
 Deno.test("compareFilesBySha256 - identical files", async () => {
