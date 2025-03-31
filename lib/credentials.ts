@@ -1,4 +1,5 @@
 import { Ask } from "@sallai/ask"
+import { Args } from "@std/cli/parse-args"
 const ask = new Ask()
 
 const allCamundaCredentials = [
@@ -30,7 +31,7 @@ export function getCredentialsFromEnv(): CamundaCredentialsInEnv {
   return credentials
 }
 
-export async function getCredentials(argv) {
+export async function getCredentials(argv: any) {
   const clusterId = argv.clusterId ||
     (await ask.input({
       name: "clusterId",
