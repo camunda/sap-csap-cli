@@ -113,21 +113,23 @@ export const setupCommand = {
     ) {
       ;({ clusterId, region, clientId, clientSecret } = argv)
     } else if (detectCredentials() === true) {
-      console.log(
-        "%c//> using credentials from environment variables",
-        "color: darkgreen; background-color: lightgray",
-      )
       ;({
         CAMUNDA_CLUSTER_ID: clusterId,
         CAMUNDA_CLUSTER_REGION: region,
         CAMUNDA_CLIENT_ID: clientId,
         CAMUNDA_CLIENT_SECRET: clientSecret,
       } = getCredentialsFromEnv())
-    } else {
-      console.log(
-        "%c//> no credentials found in environment variables",
-        "color: darkgreen; background-color: lightgray",
+      console.log("\ni Camunda API credentials found in environment:")
+      const log = Object.entries(getCredentialsFromEnv()).reduce(
+        (acc, [key, value]) => {
+          acc[key] = "***" + value.slice(-3)
+          return acc
+        },
+        {} as Record<string, string>,
       )
+      console.table(log)
+    } else {
+      console.log("\ni No Camunda API credentials found in environment. Enter credentials manually")
       ;({ clusterId, region, clientId, clientSecret } = await getCredentials(
         argv,
       ))
@@ -138,10 +140,6 @@ export const setupCommand = {
       clientId,
       clientSecret,
     }
-    console.log(
-      `%c//> credentials: ${JSON.stringify(credentials, null, 2)}`,
-      "color: darkgreen; background-color: lightgray",
-    )
 
     switch (sapIntegrationModule) {
       case "btp-plugin":
