@@ -79,10 +79,7 @@ export async function compareFilesBySha256(
   return hash1 === hash2
 }
 
-export function compareFilesByName(
-  filePath1: string,
-  filePath2: string,
-): Promise<boolean> {
+export function compareFilesByName(filePath1: string, filePath2: string) {
   const fileName1 = filePath1.split("/").pop()
   const fileName2 = filePath2.split("/").pop()
   return fileName1 === fileName2
