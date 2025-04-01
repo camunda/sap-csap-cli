@@ -5,15 +5,17 @@ console.log(
   `
 Welcome to csap - Camunda’s SAP Integration CLI`,
 )
-console.log("https://docs.camunda.io/docs/components/camunda-integrations/sap/csap-cli.md")
 console.log(
-` 
+  "https://docs.camunda.io/docs/components/camunda-integrations/sap/csap-cli.md",
+)
+console.log(
+  ` 
   __      __   _   ___ 
  / _| __ / _| / \\ | o \\
 | |_  __ \\_ \\| o ||  _/
  \\__|    |__/|_n_||_|  
                                  
-`
+`,
 )
 
 yargs(Deno.args)
