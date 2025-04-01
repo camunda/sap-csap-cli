@@ -23,15 +23,15 @@ export class Downloader {
     | null = null
 
   for: {
-    module: (typeof Downloader.Kind)[keyof typeof Downloader.Kind]
-    version: `${number}.${number}`
+    module: (typeof Downloader.Kind)[keyof typeof Downloader.Kind] //> e.g. "sap-odata-connector"
+    version: `${number}.${number}` //> c8 release, e.g. 8.7
   }
 
   constructor(
-    module: (typeof Downloader.Kind)[keyof typeof Downloader.Kind],
+    module: (typeof Downloader.Kind)[keyof typeof Downloader.Kind], //> e.g. "sap-odata-connector"
     version: `${number}.${number}`, //> c8 release, e.g. 8.7
   ) {
-    this.to = `${Deno.env.get("TMPDIR") || "/tmp/"}camunda`
+    this.to = path.join(Deno.env.get("TMPDIR") || "/tmp", "camunda")
     this.for = {
       module,
       version,
