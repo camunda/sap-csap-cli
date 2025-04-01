@@ -1,6 +1,7 @@
 import { GetResponseTypeFromEndpointMethod } from "npm:@octokit/types"
 import { Octokit } from "https://esm.sh/octokit?dts"
 import * as path from "jsr:@std/path"
+import { Kind } from "./common.ts" // Import Kind from common.ts
 
 const octokit = new Octokit({
   userAgent: "csap",
@@ -8,11 +9,6 @@ const octokit = new Octokit({
 
 export class Downloader {
   to: string
-  public static Kind = {
-    odata: "sap-odata-connector",
-    rfc: "sap-rfc-connector",
-    btp: "sap-btp-plugin",
-  } as const
   releases: Array<
     GetResponseTypeFromEndpointMethod<typeof octokit.request>["data"][number]
   > = []
@@ -23,12 +19,12 @@ export class Downloader {
     | null = null
 
   for: {
-    module: (typeof Downloader.Kind)[keyof typeof Downloader.Kind] //> e.g. "sap-odata-connector"
+    module: (typeof Kind)[keyof typeof Kind] //> e.g. "sap-odata-connector"
     version: `${number}.${number}` //> c8 release, e.g. 8.7
   }
 
   constructor(
-    module: (typeof Downloader.Kind)[keyof typeof Downloader.Kind], //> e.g. "sap-odata-connector"
+    module: (typeof Kind)[keyof typeof Kind], //> e.g. "sap-odata-connector"
     version: `${number}.${number}`, //> c8 release, e.g. 8.7
   ) {
     this.to = path.join(Deno.env.get("TMPDIR") || "/tmp", "camunda")

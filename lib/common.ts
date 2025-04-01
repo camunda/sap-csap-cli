@@ -1,5 +1,4 @@
 import { Spinner } from "@std/cli/unstable-spinner"
-import { Ask } from "@sallai/ask"
 import { crypto } from "jsr:@std/crypto"
 import process from "node:process"
 
@@ -59,6 +58,13 @@ export const sapIntegrationModules = [
   },
 ]
 export type integrationModule = typeof sapIntegrationModules[number]
+
+// mainly for Downloader and Builder
+export const Kind = {
+  odata: "sap-odata-connector",
+  rfc: "sap-rfc-connector",
+  btp: "sap-btp-plugin",
+} as const
 
 export async function compareFilesBySha256(
   filePath1: string,
