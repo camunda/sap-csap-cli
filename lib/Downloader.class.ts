@@ -67,7 +67,7 @@ export class Downloader {
         sensitivity: "base",
       })
     })
-    const latestRelease = this.releases[this.releases.length - 1]
+    const latestRelease = _releases.at(-1)
     return latestRelease
   }
 }

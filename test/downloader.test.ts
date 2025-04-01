@@ -13,15 +13,16 @@ Deno.test("should return a list of releases", async () => {
 })
 
 Deno.test("should return the latest release", async () => {
-  const downloader = new Downloader(Downloader.Kind.rfc, "8.5")
+  const downloader = new Downloader(Downloader.Kind.rfc, "8.6")
   const latestRelease = await downloader.getLatestRelease()
   assertInstanceOf(latestRelease, Object)
   assertMatch(
     latestRelease.name,
-    /8\.5\.\d+/,
+    /8\.6\.\d+/,
   )
   assertNotEquals(
     latestRelease.name,
-    "8.5.0",
+    "8.6.0",
   )
+  console.log(latestRelease)
 })
