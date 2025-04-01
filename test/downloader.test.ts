@@ -1,9 +1,11 @@
 import {
+    assertArrayIncludes,
     assertGreaterOrEqual,
     assertInstanceOf,
     assertMatch,
     assertNotEquals
 } from "jsr:@std/assert"
+import { walk } from "jsr:@std/fs/walk"
 import { Downloader } from "../lib/Downloader.class.ts"
 
 Deno.test("should return a list of releases", async () => {
@@ -24,5 +26,15 @@ Deno.test("should return the latest release", async () => {
     latestRelease.name,
     "8.6.0",
   )
-  console.log(latestRelease)
+})
+
+Deno.test("should download assets for a module", async () => {
+  const downloader = new Downloader(Downloader.Kind.odata, "8.6")
+  await downloader.pullAssets()
+  const result = []
+  for await (const dirEntry of walk(downloader.to)) {
+    result.push(dirEntry.name)
+  }
+  assertGreaterOrEqual(result.length, 1)
+  assertArrayIncludes(result, [downloader.for.module, downloader.for.version])
 })

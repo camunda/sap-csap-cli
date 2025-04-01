@@ -1,5 +1,6 @@
 import { GetResponseTypeFromEndpointMethod } from "npm:@octokit/types"
 import { Octokit } from "https://esm.sh/octokit?dts"
+import * as path from "jsr:@std/path"
 
 const octokit = new Octokit({
   userAgent: "csap",
@@ -15,6 +16,12 @@ export class Downloader {
   releases: Array<
     GetResponseTypeFromEndpointMethod<typeof octokit.request>["data"][number]
   > = []
+  latestRelease:
+    | GetResponseTypeFromEndpointMethod<
+      typeof octokit.request
+    >["data"][number]
+    | null = null
+
   for: {
     module: (typeof Downloader.Kind)[keyof typeof Downloader.Kind]
     version: `${number}.${number}`
@@ -24,7 +31,7 @@ export class Downloader {
     module: (typeof Downloader.Kind)[keyof typeof Downloader.Kind],
     version: `${number}.${number}`, //> c8 release, e.g. 8.7
   ) {
-    this.to = `${Deno.env.get("TMPDIR") || "/tmp"}/camunda`
+    this.to = `${Deno.env.get("TMPDIR") || "/tmp/"}camunda`
     this.for = {
       module,
       version,
@@ -67,7 +74,31 @@ export class Downloader {
         sensitivity: "base",
       })
     })
-    const latestRelease = _releases.at(-1)
-    return latestRelease
+    this.latestRelease = _releases.at(-1)
+    return this.latestRelease
+  }
+  async pullAssets() {
+    if (!this.latestRelease) {
+      await this.getLatestRelease()
+    }
+    for (const asset of this.latestRelease.assets) {
+      console.log(`Downloading ${asset.name}...`)
+      const response = await fetch(asset.url)
+
+      if (!response.ok) {
+        throw new Error(
+          `Failed to download ${asset.name}: ${response.statusText}`,
+        )
+      }
+
+      const dir = path.join(this.to, this.for.module, this.for.version)
+      await Deno.mkdir(dir, { recursive: true })
+      
+      const filePath = path.join(dir, asset.name)
+      const file = await Deno.open(filePath, { write: true, create: true })
+
+      await response.body?.pipeTo(file.writable)
+      console.log(`Downloaded ${asset.name} to ${filePath}`)
+    }
   }
 }
