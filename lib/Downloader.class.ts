@@ -6,7 +6,7 @@ const octokit = new Octokit({
 })
 
 export class Downloader {
-  private to: string
+  to: string
   public static Kind = {
     odata: "sap-odata-connector",
     rfc: "sap-rfc-connector",
