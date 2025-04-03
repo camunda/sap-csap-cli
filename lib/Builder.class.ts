@@ -58,7 +58,7 @@ export class Builder {
       )
       .replaceAll("<your-cluster-region>", this.credentials.region)
       .replaceAll(
-        "camunda/sap-odata-connector",
+        /camunda\/sap-odata-connector:<pick.*>/g,
         `camunda/sap-odata-connector:${this.for.semver}`,
       )
     const rawYaml = parse(mangledMtad)
