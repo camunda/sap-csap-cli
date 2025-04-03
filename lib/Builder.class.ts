@@ -24,6 +24,20 @@ export class Builder {
     this.credentials = credentials
   }
 
+  assetList() {
+    if (this.for.module !== Kind.btp) {
+      const assetList = Deno.readDirSync(this.assetLocation)
+      const assets = []
+      for (const asset of assetList) {
+        if (asset.isFile) {
+          assets.push(asset.name)
+        }
+      }
+      return assets.join(", ")
+    } else {
+      throw new Error("BTP module not supported yet")
+    }
+  }
   build() {
     if (this.for.module === Kind.odata) {
       return this.buildOData()
@@ -35,7 +49,7 @@ export class Builder {
     //   return this.buildBTP()
     // }
   }
-  buildRFC() {
+  private buildRFC() {
     // we have to:
     // - parse the mtad.yaml.example file and save it as mtad.yaml
     const rawMtad = Deno.readTextFileSync(
@@ -54,7 +68,7 @@ export class Builder {
         this.credentials.clientSecret,
       )
       .replaceAll("<your-cluster-region>", this.credentials.region)
-      
+
     const rawYaml = parse(mangledMtad)
     const mtad = stringify(rawYaml, { indent: 2 })
     Deno.writeTextFileSync(
@@ -62,7 +76,7 @@ export class Builder {
       mtad,
     )
   }
-  buildOData() {
+  private buildOData() {
     // we have to:
     // - parse the mtad.yaml.example file and save it as mtad.yaml
     const rawMtad = Deno.readTextFileSync(
@@ -223,6 +237,9 @@ export class Builder {
     Deno.writeTextFileSync(
       path.join(this.assetLocation, "mtad.yaml"),
       mtad,
+    )
+    Deno.removeSync(
+      path.join(this.assetLocation, "mtad.yaml.example"),
     )
   }
 }

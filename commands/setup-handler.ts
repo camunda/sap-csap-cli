@@ -56,7 +56,6 @@ export async function setupHandler(argv) {
       })).btpRoute
     : "n/a"
 
-
   let clusterId, region, clientId, clientSecret
   if (
     argv.clusterId && argv.region && argv.clientId &&
@@ -104,10 +103,14 @@ export async function setupHandler(argv) {
       })
       break
     case "odata":
-      odataConnector()
+      await odataConnector({
+        camundaVersion,
+        camundaDeployment,
+        credentials,
+      })
       break
     case "rfc":
-      rfcConnector()
+      await rfcConnector()
       break
     default:
       console.error("invalid SAP integration module selected")
@@ -118,6 +121,8 @@ export async function setupHandler(argv) {
     `\n%c✔ Setup completed successfully`,
     "color: green",
   )
+
+  Deno.exit(0)
 
   // FIXME: delete this
   //   console.debug(argv, {
