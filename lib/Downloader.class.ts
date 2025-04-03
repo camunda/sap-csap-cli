@@ -36,6 +36,7 @@ export class Downloader {
   }
 
   async getReleases() {
+    Deno.stdout.write(new TextEncoder().encode("i fetching releases...\n"))
     const releases = await octokit.request(
       "GET /repos/{owner}/{repo}/releases",
       {
@@ -47,6 +48,9 @@ export class Downloader {
       },
     )
     this.releases = releases.data
+    Deno.stdout.write(
+      new TextEncoder().encode(`✓ fetched releases: ${this.releases.length}\n`),
+    )
     return this.releases
   }
 
@@ -54,6 +58,9 @@ export class Downloader {
     if (!this.releases.length) {
       await this.getReleases()
     }
+    Deno.stdout.write(
+      new TextEncoder().encode("i determining latest release...\n"),
+    )
     const _releases = this.releases.filter((release) => {
       const semver = release.name ? release.name : "0.0.0"
       const [major, minor] = semver.split(".").map(Number)
@@ -72,10 +79,14 @@ export class Downloader {
       })
     })
     this.latestRelease = _releases.at(-1)
+    Deno.stdout.write(
+      new TextEncoder().encode(
+        `✓ latest release: ${this.latestRelease.name}\n`,
+      ),
+    )
     return this.latestRelease
   }
 
-  //> REVISIT: align asset type with
   private async showProgress(
     response: Response,
     filePath: string,
@@ -109,7 +120,57 @@ export class Downloader {
     }
 
     writable.close()
-    console.log(`\n✓ Downloaded to ${filePath}`)
+    Deno.stdout.write(
+      new TextEncoder().encode(`\n✓ Downloaded to ${filePath}\n`),
+    )
+  }
+
+  private async fileExists(
+    filePath: string,
+    asset: typeof this.latestRelease["assets"][number],
+  ): Promise<boolean> {
+    try {
+      const fileInfo = await Deno.stat(filePath)
+      if (fileInfo.size === asset.size) {
+        Deno.stdout.write(
+          new TextEncoder().encode(
+            `i File already exists: ${
+              path.basename(filePath)
+            } - skipping download\n`,
+          ),
+        )
+        return true
+      } else {
+        Deno.stdout.write(
+          new TextEncoder().encode(
+            `i File exists but size mismatch: ${filePath} (expected: ${asset.size}, actual: ${fileInfo.size}) - re-downloading\n`,
+          ),
+        )
+        return false
+      }
+    } catch (error) {
+      if (error instanceof Deno.errors.NotFound) {
+        return false
+      } else {
+        throw error
+      }
+    }
+  }
+
+  private async downloadAsset(
+    asset: typeof this.latestRelease["assets"][number],
+    dir: string,
+  ): Promise<void> {
+    const filePath = path.join(dir, asset.name)
+    const response = await fetch(asset.browser_download_url)
+
+    if (!response.ok) {
+      throw new Error(
+        `Failed to download ${asset.name}: ${response.statusText}`,
+      )
+    }
+
+    await this.showProgress(response, filePath, asset)
   }
 
   async pullAssets() {
@@ -124,19 +185,17 @@ export class Downloader {
       this.latestRelease.name,
     )
     this.dir = dir
+
+    await Deno.mkdir(dir, { recursive: true })
+    Deno.stdout.write(
+      new TextEncoder().encode(
+        `i starting download of ${this.latestRelease.assets.length} assets\n`,
+      ),
+    )
     for (const asset of this.latestRelease.assets) {
-      const response = await fetch(asset.browser_download_url)
-
-      if (!response.ok) {
-        throw new Error(
-          `Failed to download ${asset.name}: ${response.statusText}`,
-        )
-      }
-
-      await Deno.mkdir(dir, { recursive: true })
-
       const filePath = path.join(dir, asset.name)
-      await this.showProgress(response, filePath, asset)
+      if (await this.fileExists(filePath, asset)) continue
+      await this.downloadAsset(asset, dir)
     }
   }
 }
