@@ -1,31 +1,31 @@
 _schema-version: 3.3.0
 ID: sap-odata-connector-8.6.1
-version: "8.6.1"
+version: 8.6.1
 modules:
-- name: sap-odata-connector-8.6.1
-  type: application
-  properties:
-    CAMUNDA_CLIENT_MODE: saas
-    CAMUNDA_CLIENT_CLUSTER-ID: xxx
-    CAMUNDA_CLIENT_AUTH_CLIENT-ID: yyy
-    CAMUNDA_CLIENT_AUTH_CLIENT-SECRET: zzz
-    CAMUNDA_CLIENT_REGION: bru-2
-    CAMUNDA_CLIENT_OPERATE_ENABLED: false
-    CAMUNDA_CONNECTOR_POLLING_ENABLED: false
-    CAMUNDA_CONNECTOR_WEBHOOK_ENABLED: false
-    LOGGING_LEVEL_ROOT: WARN # any of TRACE, DEBUG, INFO, WARN, ERROR, OFF
-    LOGGING_LEVEL_IO_CAMUNDA_CONNECTOR_SAP: DEBUG # any of TRACE, DEBUG, INFO, WARN, ERROR, OFF
-  requires:
-    - name: dest-camunda-odata-connector
-    - name: conn-camunda-odata-connector
-  parameters:
-    disk-quota: 512M
-    docker:
-      image: camunda/sap-odata-connector:8.6.1
-    enable-ssh: true
-    health-check-type: process
-    instances: 1
-    memory: 2G
+  - name: sap-odata-connector-8.6.1
+    type: application
+    properties:
+      CAMUNDA_CLIENT_MODE: saas
+      CAMUNDA_CLIENT_CLUSTER-ID: xxx
+      CAMUNDA_CLIENT_AUTH_CLIENT-ID: yyy
+      CAMUNDA_CLIENT_AUTH_CLIENT-SECRET: zzz
+      CAMUNDA_CLIENT_REGION: bru-2
+      CAMUNDA_CLIENT_OPERATE_ENABLED: false
+      CAMUNDA_CONNECTOR_POLLING_ENABLED: false
+      CAMUNDA_CONNECTOR_WEBHOOK_ENABLED: false
+      LOGGING_LEVEL_ROOT: WARN
+      LOGGING_LEVEL_IO_CAMUNDA_CONNECTOR_SAP: DEBUG
+    requires:
+      - name: dest-camunda-odata-connector
+      - name: conn-camunda-odata-connector
+    parameters:
+      disk-quota: 512M
+      docker:
+        image: 'camunda/sap-odata-connector:8.6.1'
+      enable-ssh: true
+      health-check-type: process
+      instances: 1
+      memory: 2G
 resources:
   - name: dest-camunda-odata-connector
     type: org.cloudfoundry.managed-service
