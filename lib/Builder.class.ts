@@ -35,6 +35,33 @@ export class Builder {
     //   return this.buildBTP()
     // }
   }
+  buildRFC() {
+    // we have to:
+    // - parse the mtad.yaml.example file and save it as mtad.yaml
+    const rawMtad = Deno.readTextFileSync(
+      path.join(this.assetLocation, "mtad.yaml.example"),
+    )
+    const mangledMtad = rawMtad
+      .replaceAll("<app-version>", this.for.semver)
+      .replaceAll("<mangled-version>", this.for.semver)
+      .replaceAll("<your-cluster-id>", this.credentials.clusterId)
+      .replaceAll(
+        "<client-id-credential-from-api-client>",
+        this.credentials.clientId,
+      )
+      .replaceAll(
+        "<client-secret-credential-from-api-client>",
+        this.credentials.clientSecret,
+      )
+      .replaceAll("<your-cluster-region>", this.credentials.region)
+      
+    const rawYaml = parse(mangledMtad)
+    const mtad = stringify(rawYaml, { indent: 2 })
+    Deno.writeTextFileSync(
+      path.join(this.assetLocation, "mtad.yaml"),
+      mtad,
+    )
+  }
   buildOData() {
     // we have to:
     // - parse the mtad.yaml.example file and save it as mtad.yaml
