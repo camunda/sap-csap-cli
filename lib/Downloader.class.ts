@@ -75,6 +75,33 @@ export class Downloader {
     return this.latestRelease
   }
 
+  private async showProgress(response: Response, filePath: string) {
+    const contentLength = Number(response.headers.get("content-length") || 0)
+    const file = await Deno.open(filePath, { write: true, create: true })
+    const writable = file.writable.getWriter()
+    const reader = response.body?.getReader()
+
+    if (!reader) {
+      throw new Error("Failed to read response body")
+    }
+
+    let received = 0
+
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) break
+
+      await writable.write(value)
+      received += value.length
+
+      const progress = ((received / contentLength) * 100).toFixed(2)
+      await Deno.stdout.write(new TextEncoder().encode(`\r⇣ Progress: ${progress}%`))
+    }
+
+    writable.close()
+    console.log(`\n✓ Downloaded to ${filePath}`)
+  }
+
   async pullAssets() {
     if (!this.latestRelease) {
       await this.getLatestRelease()
@@ -88,8 +115,9 @@ export class Downloader {
     )
     this.dir = dir
     for (const asset of this.latestRelease.assets) {
-      console.log(`⇣ Downloading ${asset.name}...`)
-      const response = await fetch(asset.url)
+      const kb = (asset.size / 1024).toFixed(2)
+      console.log(`⇣ Downloading ${asset.name}... (${kb} KB)`)
+      const response = await fetch(asset.browser_download_url)
 
       if (!response.ok) {
         throw new Error(
@@ -100,10 +128,7 @@ export class Downloader {
       await Deno.mkdir(dir, { recursive: true })
 
       const filePath = path.join(dir, asset.name)
-      const file = await Deno.open(filePath, { write: true, create: true })
-
-      await response.body?.pipeTo(file.writable)
-      console.log(`✓ Downloaded ${asset.name} to ${filePath}`)
+      await this.showProgress(response, filePath)
     }
   }
 }
