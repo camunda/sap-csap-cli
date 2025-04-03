@@ -27,9 +27,7 @@ Deno.test("Builder should correctly build for sap-odata-connector 8.6.1", async 
   const generatedContent = await Deno.readTextFile(
     join(assetLocation, "mtad.yaml"),
   )
-
   assertEquals(generatedContent, expectedContent)
 
-  // Clean up the generated file
   await Deno.remove(join(assetLocation, "mtad.yaml"))
 })
