@@ -88,7 +88,7 @@ export class Downloader {
     )
     this.dir = dir
     for (const asset of this.latestRelease.assets) {
-      console.log(`Downloading ${asset.name}...`)
+      console.log(`⇣ Downloading ${asset.name}...`)
       const response = await fetch(asset.url)
 
       if (!response.ok) {
@@ -103,7 +103,7 @@ export class Downloader {
       const file = await Deno.open(filePath, { write: true, create: true })
 
       await response.body?.pipeTo(file.writable)
-      console.log(`Downloaded ${asset.name} to ${filePath}`)
+      console.log(`✓ Downloaded ${asset.name} to ${filePath}`)
     }
   }
 }
