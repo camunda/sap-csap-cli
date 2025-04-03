@@ -110,7 +110,11 @@ export async function setupHandler(argv) {
       })
       break
     case "rfc":
-      await rfcConnector()
+      await rfcConnector({
+        camundaVersion,
+        camundaDeployment,
+        credentials,
+      })
       break
     default:
       console.error("invalid SAP integration module selected")
