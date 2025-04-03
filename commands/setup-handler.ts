@@ -15,7 +15,7 @@ import {
   getCredentialsFromEnv,
 } from "../lib/credentials.ts"
 
-export async function setupHandler(argv) {
+export async function setupHandler(argv: any) {
   const sapIntegrationModule = argv.for ||
     (await ask.select({
       name: "for",
@@ -45,8 +45,8 @@ export async function setupHandler(argv) {
         name: "btpRoute",
         message:
           "BTP route to reach the plugin\n (host name only!, e.g. camunda-app)",
-        validate: (input: string) => {
-          if (input.includes("hana.ondemand")) {
+        validate: (input?: string) => {
+          if (input && input.includes("hana.ondemand")) {
             return false
           } else {
             return true
