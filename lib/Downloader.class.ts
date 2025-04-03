@@ -75,7 +75,12 @@ export class Downloader {
     return this.latestRelease
   }
 
-  private async showProgress(response: Response, filePath: string) {
+  //> REVISIT: align asset type with
+  private async showProgress(
+    response: Response,
+    filePath: string,
+    asset: typeof this.latestRelease["assets"][number],
+  ) {
     const contentLength = Number(response.headers.get("content-length") || 0)
     const file = await Deno.open(filePath, { write: true, create: true })
     const writable = file.writable.getWriter()
@@ -95,7 +100,12 @@ export class Downloader {
       received += value.length
 
       const progress = ((received / contentLength) * 100).toFixed(2)
-      await Deno.stdout.write(new TextEncoder().encode(`\r⇣ Progress: ${progress}%`))
+      const kb = (asset.size / 1024).toFixed(2)
+      Deno.stdout.write(
+        new TextEncoder().encode(
+          `\r⇣ Downloading ${asset.name}... (${kb} KB): ${progress}%`,
+        ),
+      )
     }
 
     writable.close()
@@ -115,8 +125,6 @@ export class Downloader {
     )
     this.dir = dir
     for (const asset of this.latestRelease.assets) {
-      const kb = (asset.size / 1024).toFixed(2)
-      console.log(`⇣ Downloading ${asset.name}... (${kb} KB)`)
       const response = await fetch(asset.browser_download_url)
 
       if (!response.ok) {
@@ -128,7 +136,7 @@ export class Downloader {
       await Deno.mkdir(dir, { recursive: true })
 
       const filePath = path.join(dir, asset.name)
-      await this.showProgress(response, filePath)
+      await this.showProgress(response, filePath, asset)
     }
   }
 }
