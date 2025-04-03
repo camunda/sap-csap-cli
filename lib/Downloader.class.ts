@@ -22,6 +22,7 @@ export class Downloader {
     module: (typeof Kind)[keyof typeof Kind] //> e.g. "sap-odata-connector"
     version: `${number}.${number}` //> c8 release, e.g. 8.7
   }
+  dir: string | "" = ""
 
   constructor(
     module: (typeof Kind)[keyof typeof Kind], //> e.g. "sap-odata-connector"
@@ -73,10 +74,19 @@ export class Downloader {
     this.latestRelease = _releases.at(-1)
     return this.latestRelease
   }
+
   async pullAssets() {
     if (!this.latestRelease) {
       await this.getLatestRelease()
     }
+    // <tmpdir>/camunda/8.6/sap-odata-connector/8.6.1/**/*
+    const dir = path.join(
+      this.to,
+      this.for.version,
+      this.for.module,
+      this.latestRelease.name,
+    )
+    this.dir = dir
     for (const asset of this.latestRelease.assets) {
       console.log(`Downloading ${asset.name}...`)
       const response = await fetch(asset.url)
@@ -87,9 +97,8 @@ export class Downloader {
         )
       }
 
-      const dir = path.join(this.to, this.for.module, this.for.version)
       await Deno.mkdir(dir, { recursive: true })
-      
+
       const filePath = path.join(dir, asset.name)
       const file = await Deno.open(filePath, { write: true, create: true })
 
