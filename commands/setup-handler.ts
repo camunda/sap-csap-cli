@@ -44,9 +44,9 @@ export async function setupHandler(argv: any) {
       (await ask.input({
         name: "btpRoute",
         message:
-          "BTP route to reach the plugin\n (host name only!, e.g. camunda-app)",
+          "BTP route to reach the plugin\n (without http(s):// and trailing /)",
         validate: (input?: string) => {
-          if (input && input.includes("hana.ondemand")) {
+          if (input?.endsWith("/") || input?.startsWith("http")) {
             return false
           } else {
             return true

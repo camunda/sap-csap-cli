@@ -32,7 +32,7 @@ export const setupCommand = {
       .option("btpRoute", {
         type: "string",
         description:
-          "(only for 'btp-plugin') BTP route (hostname) to reach the plugin",
+          "(only for 'btp-plugin') BTP route to reach the plugin",
       })
       .option("clusterId", {
         type: "string",
