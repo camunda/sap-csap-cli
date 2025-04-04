@@ -17,21 +17,24 @@ export async function btpPlugin(
     "sap-btp-plugin",
   )
 
-  // check for both
+  // check for
   // - existing target directory
   // - integrity of the repository
+  // - previous build artifacts
   if (await Deno.stat(to).then(() => true).catch(() => false)) {
     console.log(`i target directory ${to} already exists`)
     console.log(`i checking repository integrity...`)
     if (await isRepoModified(to)) {
       console.log("! target directory is not clean - purging...")
-      await Deno.remove(to, { recursive: true })
-      console.log(`✓ purged target directory ${to}`)
-      await Deno.mkdir(to, { recursive: true })
 
-      console.log(`i cloning SAP BTP Plugin repository...`)
-      await clone("https://github.com/camunda/sap-btp-plugin", "main", to)
-      console.log(`✓ cloned SAP BTP Plugin to ${to}`)
+      await purge(to)
+      await _clone(to)
+    } else if (await previousBuildExists(to)) {
+      console.log(
+        "! target directory contains previous build artifacts - purging...",
+      )
+      await purge(to)
+      await _clone(to)
     } else {
       console.log("✓ repository integrity validated - continuing")
     }
@@ -44,6 +47,44 @@ export async function btpPlugin(
     credentials,
     btpRoute,
   })
+}
+
+async function purge(dir: string) {
+  await Deno.remove(dir, { recursive: true })
+  console.log(`✓ purged target directory ${dir}`)
+  await Deno.mkdir(dir, { recursive: true })
+}
+
+async function _clone(to: string) {
+  console.log(`i cloning SAP BTP Plugin repository...`)
+  await clone("https://github.com/camunda/sap-btp-plugin", "main", to)
+  console.log(`✓ cloned SAP BTP Plugin to ${to}`)
+}
+
+async function previousBuildExists(dir: string) {
+  const mtaDir = path.join(dir, "mta_archives")
+  const mtarFiles = []
+  for await (const entry of Deno.readDir(mtaDir)) {
+    if (entry.isFile && entry.name.endsWith(".mtar")) {
+      mtarFiles.push(entry.name)
+    }
+  }
+  if (mtarFiles.length > 0) {
+    console.log("i detected previous build artifacts:", mtarFiles.join(", "))
+  }
+
+  let nodeInstall = false
+  for await (const entry of Deno.readDir(dir)) {
+    if (entry.isDirectory && entry.name === "node_modules") {
+      console.log("i detected node_modules directory")
+      nodeInstall = true
+    }
+  }
+  if (nodeInstall || mtarFiles.length > 0) {
+    return true
+  } else {
+    return false
+  }
 }
 
 async function build(
@@ -176,7 +217,7 @@ function buildCore() {
     args: ["run", "build", "-w", "core"],
   })
 
-  const { code, stderr } = cmd.outputSync()
+  const { code, stderr, stdout } = cmd.outputSync()
   if (code !== 0) {
     console.error(
       "%c//> backend build error",
@@ -184,6 +225,8 @@ function buildCore() {
       new TextDecoder().decode(stderr),
     )
     Deno.exit(code)
+  } else {
+    console.log(new TextDecoder().decode(stdout))
   }
 }
 
@@ -191,7 +234,7 @@ function buildApp() {
   const cmd = new Deno.Command("npm", {
     args: ["run", "build", "-w", "fiori-app"],
   })
-  const { code, stderr } = cmd.outputSync()
+  const { code, stderr, stdout } = cmd.outputSync()
   if (code !== 0) {
     console.error(
       "%c//> frontend build error",
@@ -199,6 +242,8 @@ function buildApp() {
       new TextDecoder().decode(stderr),
     )
     Deno.exit(code)
+  } else {
+    console.log(new TextDecoder().decode(stdout))
   }
 }
 
@@ -206,7 +251,7 @@ function buildMbt() {
   const cmd = new Deno.Command("npx", {
     args: ["--yes", "mbt", "build"],
   })
-  const { code, stderr } = cmd.outputSync()
+  const { code, stderr, stdout } = cmd.outputSync()
   if (code !== 0) {
     console.error(
       "%c//> archive build error",
@@ -214,6 +259,8 @@ function buildMbt() {
       new TextDecoder().decode(stderr),
     )
     Deno.exit(code)
+  } else {
+    console.log(new TextDecoder().decode(stdout))
   }
 }
 
