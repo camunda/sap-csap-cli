@@ -21,26 +21,28 @@ export async function btpPlugin(
   // - existing target directory
   // - integrity of the repository
   // - previous build artifacts
-  if (await Deno.stat(to).then(() => true).catch(() => false)) {
-    console.log(`i target directory ${to} already exists`)
-    console.log(`i checking repository integrity...`)
-    if (await isRepoModified(to)) {
-      console.log("! target directory is not clean - purging...")
-
-      await purge(to)
-      await _clone(to)
-    } else if (await previousBuildExists(to)) {
-      console.log(
-        "! target directory contains previous build artifacts - purging...",
-      )
-      await purge(to)
-      await _clone(to)
-    } else {
-      console.log("✓ repository integrity validated - continuing")
-    }
+  const directoryExists = await Deno.stat(to).then(() => true).catch(() => false);
+  
+  if (!directoryExists) {
+    await Deno.mkdir(to, { recursive: true });
+    await _clone(to);
   } else {
-    await Deno.mkdir(to, { recursive: true }) 
-    await _clone(to)
+    console.log(`i target directory ${to} already exists`);
+    console.log(`i checking repository integrity...`);
+    
+    const resetRepo = async (reason: string) => {
+      console.log(`! ${reason} - purging...`);
+      await purge(to);
+      await _clone(to);
+    };
+
+    if (await isRepoModified(to)) {
+      await resetRepo("target directory is not clean");
+    } else if (await previousBuildExists(to)) {
+      await resetRepo("target directory contains previous build artifacts");
+    } else {
+      console.log("✓ repository integrity validated - continuing");
+    }
   }
 
   await build({
