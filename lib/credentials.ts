@@ -41,7 +41,7 @@ export async function getCredentials(argv: any) {
     (await ask.input({
       name: "region",
       message: "Camunda ClusterRegion",
-      default: "bru2",
+      default: "bru-2",
     })).region
   const clientId = argv.clientId ||
     (await ask.input({
