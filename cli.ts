@@ -19,6 +19,7 @@ console.log(
 )
 
 yargs(Deno.args)
+  .wrap(null)
   .scriptName("csap")
   .usage("Usage: \n  $0 <command>")
   .version(

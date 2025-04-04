@@ -8,10 +8,11 @@ import { setupHandler } from "./setup-handler.ts"
 
 export const setupCommand = {
   command:
-    "setup [for] [camunda] [deployment] [clusterId] [clientId] [clientSecret] [region] [btpRoute]",
+    `setup [for] [camunda] [deployment] [clusterId] [region] [clientId] [clientSecret] [btpRoute]`,
   describe: "prepare one of Camunda's SAP Integration modules for deployment",
   builder: (yargs: YargsInstance) => {
     return yargs
+      .wrap(null)
       .option("for", {
         type: "string",
         description: "SAP integration module",
@@ -32,7 +33,7 @@ export const setupCommand = {
       .option("btpRoute", {
         type: "string",
         description:
-          "(only for 'btp-plugin') BTP route to reach the plugin",
+          "(only for 'btp-plugin' or 'all') BTP route to reach the plugin",
       })
       .option("clusterId", {
         type: "string",
