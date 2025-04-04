@@ -87,20 +87,109 @@ export async function getGitCommitHash(
     return null
   }
 }
+export async function isRepoModified(
+  directory: string,
+): Promise<boolean> {
+  try {
+    const statusProcess = new Deno.Command("git", {
+      args: ["-C", directory, "status", "--porcelain"],
+    })
 
-export async function clone(repo: string, branch: string, to: string): Promise<boolean> {
+    const { stdout, stderr } = await statusProcess.output()
+
+    if (stderr.length > 0) {
+      console.error(new TextDecoder().decode(stderr))
+      return true
+    }
+
+    const output = new TextDecoder().decode(stdout).trim()
+
+    // Parse the output to find deleted files
+    const deletedFiles = output
+      .split("\n")
+      .filter((line) => line.startsWith("D") || line.startsWith("M"))
+      .map((line) => line.slice(2).trim())
+
+    if (deletedFiles.length > 0) {
+      console.log(
+        "! detected local git repository modifications:",
+        deletedFiles.join(", "),
+      )
+    }
+    return deletedFiles.length > 0
+  } catch (error) {
+    console.error("Error detecting local deletions:", error)
+    return true
+  }
+}
+
+export async function compareBranchIntegrity(
+  directory: string,
+  branch: string,
+): Promise<boolean> {
+  try {
+    const fetchProcess = new Deno.Command("git", {
+      args: ["-C", directory, "fetch", "--quiet", "origin", branch],
+      stdout: "piped",
+      stderr: "piped",
+    })
+    const fetchResult = await fetchProcess.output()
+
+    if (fetchResult.stderr.length > 0) {
+      console.error(new TextDecoder().decode(fetchResult.stderr))
+      return false
+    }
+
+    const localHashProcess = new Deno.Command("git", {
+      args: ["-C", directory, "rev-parse", branch],
+      stdout: "piped",
+      stderr: "piped",
+    })
+    const localHashResult = await localHashProcess.output()
+
+    if (localHashResult.stderr.length > 0) {
+      console.error(new TextDecoder().decode(localHashResult.stderr))
+      return false
+    }
+    const localHash = new TextDecoder().decode(localHashResult.stdout).trim()
+
+    const remoteHashProcess = new Deno.Command("git", {
+      args: ["-C", directory, "rev-parse", `origin/${branch}`],
+      stdout: "piped",
+      stderr: "piped",
+    })
+    const remoteHashResult = await remoteHashProcess.output()
+
+    if (remoteHashResult.stderr.length > 0) {
+      console.error(new TextDecoder().decode(remoteHashResult.stderr))
+      return false
+    }
+    const remoteHash = new TextDecoder().decode(remoteHashResult.stdout).trim()
+
+    return localHash === remoteHash
+  } catch (error) {
+    console.error("Error comparing branch integrity:", error)
+    return false
+  }
+}
+
+export async function clone(
+  repo: string,
+  branch: string,
+  to: string,
+): Promise<boolean> {
   try {
     const process = new Deno.Command("git", {
       args: ["clone", "--branch", branch, repo, to],
       stdout: "inherit",
       stderr: "inherit",
-    });
+    })
 
-    const status = await process.spawn().status;
-    
-    return status.success;
+    const status = await process.spawn().status
+
+    return status.success
   } catch (error) {
-    console.error("Git clone operation failed:", error);
-    return false;
+    console.error("Git clone operation failed:", error)
+    return false
   }
 }
