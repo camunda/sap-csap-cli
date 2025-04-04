@@ -1,20 +1,18 @@
 import { Spinner } from "@std/cli/unstable-spinner"
-import { crypto } from "jsr:@std/crypto"
-import process from "node:process"
 
-export function progress() {
-  const spinner = new Spinner({ color: "yellow" })
-  spinner.message = "Setting up csap ..."
-  const originalStop = spinner.stop
-  const _stop = () => {
-    originalStop.call(spinner)
-    // hacky hacksor to remove the "setting up csap ..." message
-    process.stdout.moveCursor(0, -1)
-    process.stdout.clearLine(1)
-  }
-  spinner.stop = _stop
-  return spinner
-}
+// export function progress() {
+//   const spinner = new Spinner({ color: "yellow" })
+//   spinner.message = "Setting up csap ..."
+//   const originalStop = spinner.stop
+//   const _stop = () => {
+//     originalStop.call(spinner)
+//     // hacky hacksor to remove the "setting up csap ..." message
+//     process.stdout.moveCursor(0, -1)
+//     process.stdout.clearLine(1)
+//   }
+//   spinner.stop = _stop
+//   return spinner
+// }
 
 export function step(message: string) {
   //   const spinner = new Spinner({ spinner: ["i","-","¡","-"]  })
@@ -65,31 +63,6 @@ export const Kind = {
   rfc: "sap-rfc-connector",
   btp: "sap-btp-plugin",
 } as const
-
-export async function compareFilesBySha256(
-  filePath1: string,
-  filePath2: string,
-): Promise<boolean> {
-  const hashFile = async (filePath: string): Promise<string> => {
-    const fileContent = await Deno.readFile(filePath)
-    const hashBuffer = await crypto.subtle.digest("SHA-256", fileContent)
-    return Array.from(new Uint8Array(hashBuffer))
-      .map((b) => b.toString(16).padStart(2, "0"))
-      .join("")
-  }
-
-  const [hash1, hash2] = await Promise.all([
-    hashFile(filePath1),
-    hashFile(filePath2),
-  ])
-  return hash1 === hash2
-}
-
-export function compareFilesByName(filePath1: string, filePath2: string) {
-  const fileName1 = filePath1.split("/").pop()
-  const fileName2 = filePath2.split("/").pop()
-  return fileName1 === fileName2
-}
 
 export async function getGitCommitHash(
   directory: string,
