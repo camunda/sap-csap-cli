@@ -13,6 +13,11 @@ cd "$PROJECT_ROOT"
 # Define output directory
 OUTPUT_DIR="$PROJECT_ROOT/dist"
 mkdir -p "$OUTPUT_DIR"
+# If output directory is not empty, clean it
+if [ "$(ls -A "$OUTPUT_DIR" 2>/dev/null)" ]; then
+    echo "Cleaning output directory..."
+    rm -rf "$OUTPUT_DIR"/*
+fi
 
 # Define the main CLI file
 CLI_FILE="cli.ts"
@@ -32,9 +37,9 @@ for target in "${TARGETS[@]}"; do
   
   # Define output filename based on target
   if [[ "$target" == *"windows"* ]]; then
-    output_filename="csap-cli-${target}.exe"
+    output_filename="csap-${target}.exe"
   else
-    output_filename="csap-cli-${target}"
+    output_filename="csap-${target}"
   fi
   
   # Run the compile command
