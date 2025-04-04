@@ -88,19 +88,19 @@ export async function getGitCommitHash(
   }
 }
 
-export async function clone(repo: string, branch: string, to: string) {
-  const process = new Deno.Command("git", {
-    args: ["clone", "--branch", branch, repo, to],
-    stdout: "piped",
-    stderr: "piped",
-  })
+export async function clone(repo: string, branch: string, to: string): Promise<boolean> {
+  try {
+    const process = new Deno.Command("git", {
+      args: ["clone", "--branch", branch, repo, to],
+      stdout: "inherit",
+      stderr: "inherit",
+    });
 
-  const { stdout, stderr } = await process.output()
-
-  if (stderr.length > 0) {
-    console.error(new TextDecoder().decode(stderr))
-    return null
+    const status = await process.spawn().status;
+    
+    return status.success;
+  } catch (error) {
+    console.error("Git clone operation failed:", error);
+    return false;
   }
-
-  return new TextDecoder().decode(stdout)
 }
