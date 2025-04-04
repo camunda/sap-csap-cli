@@ -75,6 +75,9 @@ export class Builder {
       path.join(this.assetLocation, "mtad.yaml"),
       mtad,
     )
+    Deno.removeSync(
+      path.join(this.assetLocation, "mtad.yaml.example"),
+    )
   }
   private buildOData() {
     // we have to:
