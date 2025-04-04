@@ -38,6 +38,9 @@ export async function btpPlugin(
     } else {
       console.log("✓ repository integrity validated - continuing")
     }
+  } else {
+    await Deno.mkdir(to, { recursive: true }) 
+    await _clone(to)
   }
 
   await build({
