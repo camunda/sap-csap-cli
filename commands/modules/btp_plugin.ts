@@ -64,9 +64,11 @@ async function _clone(to: string) {
 async function previousBuildExists(dir: string) {
   const mtaDir = path.join(dir, "mta_archives")
   const mtarFiles = []
-  for await (const entry of Deno.readDir(mtaDir)) {
-    if (entry.isFile && entry.name.endsWith(".mtar")) {
-      mtarFiles.push(entry.name)
+  if (await Deno.stat(mtaDir).then(() => true).catch(() => false)) {
+    for await (const entry of Deno.readDir(mtaDir)) {
+      if (entry.isFile && entry.name.endsWith(".mtar")) {
+        mtarFiles.push(entry.name)
+      }
     }
   }
   if (mtarFiles.length > 0) {
