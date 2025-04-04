@@ -101,17 +101,20 @@ export class Downloader {
       throw new Error("Failed to read response body")
     }
 
+    const kb = (asset.size / 1024).toFixed(2)
     let received = 0
 
     while (true) {
       const { done, value } = await reader.read()
-      if (done) break
+      if (done) {
+        console.log("")
+        break
+      }
 
       await writable.write(value)
       received += value.length
 
       const progress = ((received / contentLength) * 100).toFixed(2)
-      const kb = (asset.size / 1024).toFixed(2)
       Deno.stdout.write(
         new TextEncoder().encode(
           `\r⇣ Downloading ${asset.name}... (${kb} KB): ${progress}%`,
@@ -120,9 +123,6 @@ export class Downloader {
     }
 
     writable.close()
-    Deno.stdout.write(
-      new TextEncoder().encode(`\n✓ Downloaded to ${filePath}\n`),
-    )
   }
 
   private async fileExists(
