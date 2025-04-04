@@ -10,8 +10,6 @@ export async function odataConnector(
     credentials: CamundaCredentials
   },
 ) {
-
-  
   const odataConnector = new Downloader(Kind.odata, camundaVersion)
   await odataConnector.pullAssets()
   const downloadDir = odataConnector.dir
@@ -27,7 +25,7 @@ export async function odataConnector(
 
   console.log("")
   console.log(
-    `🛠️ successfully built OData connector ${latestRelease.name}\n\tfor Camunda ${camundaDeployment} ${camundaVersion}\n\tin directory ${downloadDir}`)
+    `🛠️ successfully built OData connector ${latestRelease.name}\n\tfor Camunda ${camundaDeployment} ${camundaVersion}\n\tin directory ${downloadDir}`,
+  )
   console.log(`︙here's the file listing: ${odataConnectorBuilder.assetList()}`)
-
 }
