@@ -231,7 +231,8 @@ function buildCore() {
     )
     Deno.exit(code)
   } else {
-    console.log(new TextDecoder().decode(stdout))
+    console.log(new TextDecoder().decode(stdout)),
+    console.log("✓ backend build finished")
   }
 }
 
@@ -249,6 +250,7 @@ function buildApp() {
     Deno.exit(code)
   } else {
     console.log(new TextDecoder().decode(stdout))
+    console.log("✓ frontend build finished")
   }
 }
 
