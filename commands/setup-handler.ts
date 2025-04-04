@@ -94,6 +94,20 @@ export async function setupHandler(argv: any) {
   }
 
   switch (sapIntegrationModule) {
+    case "all": {
+      const options = {
+        camundaVersion,
+        camundaDeployment,
+        credentials,
+      }
+      await odataConnector(options)
+      await rfcConnector(options)
+      await btpPlugin({
+        btpRoute,
+        ...options,
+      })
+      break
+    }
     case "btp-plugin":
       await btpPlugin({
         camundaVersion,
