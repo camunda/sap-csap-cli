@@ -150,14 +150,21 @@ async function build(
   console.log(
     `🛠️ successfully built BTP Plugin\n\tfor Camunda ${camundaDeployment} ${camundaVersion}\n\tin directory ${inDir}`,
   )
+
+  const mtarDir = path.join(inDir, "mta_archives")
+  const mtars = []
+  if (await Deno.stat(mtarDir).then(() => true).catch(() => false)) {
+    for await (const entry of Deno.readDir(mtarDir)) {
+      if (entry.isFile && entry.name.endsWith(".mtar")) {
+        mtars.push(entry.name)
+      }
+    }
+  } else {
+    console.error("mta_archives directory not found")
+    Deno.exit(1)
+  }
   console.log(
-    `︙here's the deployment archive (.mtar): ${
-      path.join(
-        inDir,
-        "mta_archives",
-        `sap-btp-plugin-${btpPluginVersion}.mtar`,
-      )
-    }`,
+    `︙here's the deployment archive (.mtar): ${mtars.join(", ")}`,
   )
 }
 
@@ -236,7 +243,7 @@ function buildCore() {
     Deno.exit(code)
   } else {
     console.log(new TextDecoder().decode(stdout)),
-    console.log("✓ backend build finished")
+      console.log("✓ backend build finished")
   }
 }
 
