@@ -37,9 +37,7 @@ export async function setupHandler(argv: any) {
       default: camundaDeploymentOptions[0].value,
       choices: camundaDeploymentOptions,
     })).deployment
-  const btpRoute = sapIntegrationModule === sapIntegrationModules.find(
-      (m) => m.value === "btp-plugin",
-    )?.value
+  const btpRoute = ["btp-plugin", "all"].includes(sapIntegrationModule)
     ? argv.btpRoute ||
       (await ask.input({
         name: "btpRoute",
