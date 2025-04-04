@@ -127,16 +127,4 @@ export async function setupHandler(argv: any) {
   )
 
   Deno.exit(0)
-
-  // FIXME: delete this
-  //   console.debug(argv, {
-  //     sapIntegrationModule,
-  //     camundaVersion,
-  //     camundaDeployment,
-  //     btpRoute,
-  //     clusterId,
-  //     region,
-  //     clientId,
-  //     clientSecret,
-  //   })
 }
