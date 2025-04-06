@@ -10,6 +10,9 @@ export async function odataConnector(
     credentials: CamundaCredentials
   },
 ) {
+  console.log("")
+  console.log("%c//> OData connector setup", "color:orange")
+
   const odataConnector = new Downloader(Kind.odata, camundaVersion)
   await odataConnector.pullAssets()
   const downloadDir = odataConnector.dir

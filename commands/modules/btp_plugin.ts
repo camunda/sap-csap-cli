@@ -10,6 +10,9 @@ export async function btpPlugin(
     btpRoute: string
   },
 ) {
+  console.log("")
+  console.log("%c//> BTP Plugin setup", "color:orange")
+
   const to = path.join(
     Deno.env.get("TMPDIR") || "/tmp",
     "camunda",

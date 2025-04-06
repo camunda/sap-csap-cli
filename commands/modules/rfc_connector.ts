@@ -10,6 +10,9 @@ export async function rfcConnector(
     credentials: CamundaCredentials
   },
 ) {
+  console.log("")
+  console.log("%c//> RFC connector setup", "color:orange")
+
   const rfcConnector = new Downloader(Kind.rfc, camundaVersion)
   await rfcConnector.pullAssets()
   const downloadDir = rfcConnector.dir
