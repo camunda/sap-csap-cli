@@ -18,6 +18,7 @@ Deno.test("should return a list of releases", async () => {
 Deno.test("should return the latest release", async () => {
   const downloader = new Downloader(Kind.rfc, "8.6")
   const latestRelease = await downloader.getLatestRelease()
+  await new Promise((resolve) => setTimeout(resolve, 100)) //> ...
   assertInstanceOf(latestRelease, Object)
   assertMatch(
     latestRelease.name,
