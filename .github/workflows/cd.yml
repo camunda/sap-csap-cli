@@ -4,8 +4,8 @@ on:
   push:
     branches:
       - main
-    paths:
-      - "**/*.ts"
+    # paths:
+    #   - "**/*.ts"
 
 # Set DENO_DIR to an absolute or relative path on the runner.
 env:
@@ -27,11 +27,11 @@ jobs:
         with:
           deno-version: v2.x
 
-      - name: Cache Deno dependencies
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.DENO_DIR }}
-          key: ${{ hashFiles('deno.lock') }}-${{ runner.os }}
+      # - name: Cache Deno dependencies
+      #   uses: actions/cache@v4
+      #   with:
+      #     path: ${{ env.DENO_DIR }}
+      #     key: ${{ hashFiles('deno.lock') }}-${{ runner.os }}
 
       - name: Run tests
         run: deno test --allow-all
@@ -49,11 +49,11 @@ jobs:
         with:
           deno-version: v2.x
 
-      - name: Cache Deno dependencies
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.DENO_DIR }}
-          key: ${{ hashFiles('deno.lock') }}-${{ runner.os }}
+      # - name: Cache Deno dependencies
+      #   uses: actions/cache@v4
+      #   with:
+      #     path: ${{ env.DENO_DIR }}
+      #     key: ${{ hashFiles('deno.lock') }}-${{ runner.os }}
 
       - name: deno install
         run: deno install
