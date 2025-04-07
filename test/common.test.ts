@@ -3,13 +3,13 @@ import { getGitCommitHash } from "../lib/common.ts"
 
 Deno.test("getGitCommitHash - valid repository", async () => {
   // set temporary git user and email
-  await new Deno.Command("git", {
-    args: ["config", "--global", "user.name", "\"test\""],
-  })
-  await new Deno.Command("git", {
-    args: ["config", "--global", "user.email", "\"test@example.org\""],
-  })
-  
+  // await new Deno.Command("git", {
+  //   args: ["config", "--global", "user.name", "\"test\""],
+  // })
+  // await new Deno.Command("git", {
+  //   args: ["config", "--global", "user.email", "\"test@example.org\""],
+  // })
+
   const tempDir = await Deno.makeTempDir()
   const gitInit = new Deno.Command("git", { args: ["init", tempDir] })
   const init = await gitInit.output()
