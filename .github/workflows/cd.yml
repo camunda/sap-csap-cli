@@ -18,8 +18,8 @@ jobs:
     strategy:
       matrix:
         ### FIXME: test involving native git commands fails on ubuntu-latest
-        # os: [ubuntu-latest, macos-latest, windows-latest]
-        os: [macos-latest, windows-latest]
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        # os: [macos-latest, windows-latest]
     steps:
       - name: line endings for windows
         if: runner.os == 'Windows'
@@ -40,6 +40,11 @@ jobs:
       #   with:
       #     path: ${{ env.DENO_DIR }}
       #     key: ${{ hashFiles('deno.lock') }}-${{ runner.os }}
+
+      - name: set tmp git identifiers
+        run:
+          git config --global user.name "Camunda gh action"
+          git config --global user.email "camunda@noreply.github.local"
 
       - name: Run tests
         run: deno test --allow-all
