@@ -75,6 +75,10 @@ export async function getGitCommitHash(
     })
 
     const { stdout, stderr } = await process.output()
+    
+    console.log("getCommitHash stdout", new TextDecoder().decode(stdout))
+    console.log("getCommitHash stderr", new TextDecoder().decode(stderr))
+
 
     if (stderr.length > 0) {
       console.error(new TextDecoder().decode(stderr))
