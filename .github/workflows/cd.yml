@@ -42,7 +42,7 @@ jobs:
       #     key: ${{ hashFiles('deno.lock') }}-${{ runner.os }}
 
       - name: set tmp git identifiers
-        run:
+        run: |
           git config --global user.name "Camunda gh action"
           git config --global user.email "camunda@noreply.github.local"
 
