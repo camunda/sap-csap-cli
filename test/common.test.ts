@@ -2,21 +2,12 @@ import { assertEquals, assertNotEquals } from "jsr:@std/assert"
 import { getGitCommitHash } from "../lib/common.ts"
 
 Deno.test("getGitCommitHash - valid repository", async () => {
-  // set temporary git user and email
-  // await new Deno.Command("git", {
-  //   args: ["config", "--global", "user.name", "\"test\""],
-  // })
-  // await new Deno.Command("git", {
-  //   args: ["config", "--global", "user.email", "\"test@example.org\""],
-  // })
-
   const tempDir = await Deno.makeTempDir()
   const gitInit = new Deno.Command("git", { args: ["init", tempDir] })
   const init = await gitInit.output()
   if (!init.success) {
     console.error(`git init failed: ${new TextDecoder().decode(init.stderr)}`)
   }
-
 
   // Create a file and make an initial commit
   const filePath = `${tempDir}/test.txt`
@@ -44,8 +35,6 @@ Deno.test("getGitCommitHash - valid repository", async () => {
       `git commit failed: ${new TextDecoder().decode(commit.stderr)}`,
     )
   }
-
-  console.log(`get git commit hash for dir ${tempDir}`)
 
   const commitHash = await getGitCommitHash(tempDir)
   assertNotEquals(commitHash, null)
