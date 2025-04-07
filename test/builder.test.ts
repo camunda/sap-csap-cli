@@ -31,6 +31,7 @@ Deno.test("should correctly build for sap-odata-connector 8.6.1", async () => {
 
   await Deno.remove(join(assetLocation, "mtad.yaml"))
 })
+
 Deno.test("should correctly build for sap-rfc-connector 8.6.2", async () => {
   const assetLocation = join(
     Deno.cwd(),
