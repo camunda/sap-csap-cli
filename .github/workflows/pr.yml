@@ -1,0 +1,45 @@
+name: test PRs
+
+on:
+  pull_request:
+    branches:
+      - main
+
+# Set DENO_DIR to an absolute or relative path on the runner.
+env:
+  DENO_DIR: ${{ github.workspace }}/.deno-cache
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - name: line endings for windows
+        if: runner.os == 'Windows'
+        run: |
+          git config --system core.autocrlf false
+          git config --system core.eol lf
+
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      # - name: Cache Deno dependencies
+      #   uses: actions/cache@v4
+      #   with:
+      #     path: ${{ env.DENO_DIR }}
+      #     key: ${{ hashFiles('deno.lock') }}-${{ runner.os }}
+
+      - name: set tmp git identifiers (for tests involving git)
+        run: |
+          git config --global user.name "Camunda gh action"
+          git config --global user.email "camunda@noreply.github.local"
+
+      - name: Run tests
+        run: deno test --allow-all
