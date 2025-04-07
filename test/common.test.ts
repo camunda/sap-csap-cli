@@ -9,6 +9,14 @@ Deno.test("getGitCommitHash - valid repository", async () => {
     console.error(`git init failed: ${new TextDecoder().decode(init.stderr)}`)
   }
 
+  // set temporary git user and email
+  await new Deno.Command("git", {
+    args: ["-C", tempDir, "config", "user.name", "test"],
+  })
+  await new Deno.Command("git", {
+    args: ["-C", tempDir, "config", "user.email", "test@example.org"],
+  })
+
   // Create a file and make an initial commit
   const filePath = `${tempDir}/test.txt`
   await Deno.writeTextFile(filePath, "initial content")
@@ -37,7 +45,7 @@ Deno.test("getGitCommitHash - valid repository", async () => {
   }
 
   console.log(`get git commit hash for dir ${tempDir}`)
-  
+
   const commitHash = await getGitCommitHash(tempDir)
   assertNotEquals(commitHash, null)
 
