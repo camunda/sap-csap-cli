@@ -36,6 +36,8 @@ Deno.test("getGitCommitHash - valid repository", async () => {
     )
   }
 
+  console.log(`get git commit hash for dir ${tempDir}`)
+  
   const commitHash = await getGitCommitHash(tempDir)
   assertNotEquals(commitHash, null)
 
