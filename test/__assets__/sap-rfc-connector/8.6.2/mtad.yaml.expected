@@ -1,5 +1,5 @@
 _schema-version: 3.3.0
-ID: sap-rfc-connector-8.6.2
+ID: sap-rfc-connector-8_6_2
 version: 8.6.2
 modules:
   - name: sap-rfc-connector
@@ -41,7 +41,7 @@ resources:
     parameters:
       config:
         tenant-mode: dedicated
-        xsappname: sap-rfc-connector-8.6.2
+        xsappname: sap-rfc-connector-8_6_2
       service: xsuaa
       service-plan: application
   - name: dest-camunda-rfc-connector

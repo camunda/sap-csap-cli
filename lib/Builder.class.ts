@@ -57,7 +57,10 @@ export class Builder {
     )
     const mangledMtad = rawMtad
       .replaceAll("<app-version>", this.for.semver)
-      .replaceAll("<mangled-version>", this.for.semver)
+      // to prevent 
+      // Error parsing xs-security.json data: Inconsistent xs-security.json: Invalid xsappname "...": May only include characters 'a'-'z', 'A'-'Z', '0'-'9', '_', '-', '\', and '/'.)
+      // at deploy-time
+      .replaceAll("<mangled-version>", this.for.semver.replaceAll(".", "_"))
       .replaceAll("<your-cluster-id>", this.credentials.clusterId)
       .replaceAll(
         "<client-id-credential-from-api-client>",
