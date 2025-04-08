@@ -1,0 +1,85 @@
+
+name: CD for csap CLI
+
+on:
+  push:
+    branches:
+      - signing-test
+
+# Set DENO_DIR to an absolute or relative path on the runner.
+env:
+  DENO_DIR: ${{ github.workspace }}/.deno-cache
+  version: ""
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest]
+    steps:
+      - name: Import Secrets
+        id: secrets
+        uses: hashicorp/vault-action@7709c609789c5e27b757a85817483caadbb5939a # v3.3.0
+        with:
+          url: ${{ secrets.VAULT_ADDR }}
+          method: approle
+          roleId: ${{ secrets.VAULT_ROLE_ID }}
+          secretId: ${{ secrets.VAULT_SECRET_ID }}
+          secrets: |
+            secret/data/products/distribution/ci APPLE_CERTIFICATE;
+            secret/data/products/distribution/ci APPLE_CERTIFICATE_PASSWORD;
+            secret/data/products/distribution/ci APPLE_DEVELOPER_ID;
+            secret/data/products/distribution/ci APPLE_DEVELOPER_PASSWORD;
+            secret/data/products/distribution/ci APPLE_TEAM_ID;
+            secret/data/products/distribution/ci APPLE_COMMON_NAME;
+
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: set tmp git identifiers (for tests involving git)
+        run: |
+          git config --global user.name "Camunda gh action"
+          git config --global user.email "camunda@noreply.github.local"
+
+      - name: Run tests
+        run: deno test --allow-all
+
+      - name: deno install
+        run: deno install
+
+      - name: Run compile-all-targets.sh
+        run: |
+          chmod +x scripts/compile-all-targets.sh
+          ./scripts/compile-all-targets.sh
+
+      - name: Get version from deno.json
+        id: get-version
+        run: |
+          VERSION=$(jq -r '.version' deno.json)
+          echo "version=$VERSION" >> $GITHUB_ENV
+
+      - name: Sign and notarize
+        uses: ./.github/actions/sign-and-notarize
+        with:
+          p12-base64: ${{ steps.secrets.outputs.APPLE_CERTIFICATE }}
+          p12-password: ${{ steps.secrets.outputs.APPLE_CERTIFICATE_PASSWORD }}
+          developer-id-cert-name: ${{ steps.secrets.outputs.APPLE_DEVELOPER_ID }}
+          apple-id: ${{ steps.secrets.outputs.APPLE_DEVELOPER_ID }}
+          app-password: ${{ steps.secrets.outputs.APPLE_DEVELOPER_PASSWORD }}
+          team-id: ${{ steps.secrets.outputs.APPLE_TEAM_ID }}
+          path: ./dist
+
+#       - name: create gh release
+#         uses: ncipollo/release-action@v1
+#         with:
+#           artifacts: "dist/*"
+#           token: ${{ secrets.GITHUB_TOKEN }}
+#           tag: ${{ env.version }}
+#           allowUpdates: "true"
+#           removeArtifacts: "true"
