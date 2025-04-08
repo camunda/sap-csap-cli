@@ -1,5 +1,5 @@
 
-name: CD for csap CLI
+name: mac signing
 
 on:
   push:
