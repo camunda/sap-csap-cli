@@ -1,10 +1,11 @@
-import { GetResponseTypeFromEndpointMethod } from "npm:@octokit/types"
-import { Octokit } from "https://esm.sh/octokit?dts"
-import * as path from "jsr:@std/path"
-import { Kind } from "./common.ts" // Import Kind from common.ts
+import { Octokit } from "https://esm.sh/octokit?dts";
+import * as path from "jsr:@std/path";
+import { GetResponseTypeFromEndpointMethod } from "npm:@octokit/types";
+import { Kind } from "./common.ts"; // Import Kind from common.ts
 
 const octokit = new Octokit({
   userAgent: "csap",
+  auth: Deno.env.get("GH_TOKEN")
 })
 
 export class Downloader {
