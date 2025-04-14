@@ -3,7 +3,7 @@ name: test PRs
 on:
   pull_request:
     branches:
-      - main
+      - mainXXX
 
 # Set DENO_DIR to an absolute or relative path on the runner.
 env:
