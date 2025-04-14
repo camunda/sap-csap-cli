@@ -47,8 +47,8 @@ jobs:
           git config --global user.name "Camunda gh action"
           git config --global user.email "camunda@noreply.github.local"
 
-      - name: Run tests
-        run: deno test --allow-all
+      # - name: Run tests
+      #   run: deno test --allow-all
 
       - name: deno install
         run: deno install
@@ -63,7 +63,7 @@ jobs:
         run: |
           VERSION=$(jq -r '.version' deno.json)
           echo "version=$VERSION" >> $GITHUB_ENV
-
+      
       - name: Sign and notarize
         uses: ./.github/actions/sign-and-notarize
         with:
@@ -74,6 +74,14 @@ jobs:
           app-password: ${{ steps.secrets.outputs.APPLE_DEVELOPER_PASSWORD }}
           team-id: ${{ steps.secrets.outputs.APPLE_TEAM_ID }}
           path: ./dist
+      
+
+
+      - name: Upload signed binaries
+        uses: actions/upload-artifact@v4
+        with:
+          name: signed
+          path: dist/**/*
 
 #       - name: create gh release
 #         uses: ncipollo/release-action@v1

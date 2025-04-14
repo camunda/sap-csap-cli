@@ -24,11 +24,11 @@ CLI_FILE="cli.ts"
 
 # Define all target architectures supported by Deno 2
 TARGETS=(
-  "x86_64-unknown-linux-gnu"   # Linux x64
-  "x86_64-pc-windows-msvc"     # Windows x64
-  "x86_64-apple-darwin"        # macOS Intel
+  # "x86_64-unknown-linux-gnu"   # Linux x64
+  # "x86_64-pc-windows-msvc"     # Windows x64
+  # "x86_64-apple-darwin"        # macOS Intel
   "aarch64-apple-darwin"       # macOS Apple Silicon
-  "aarch64-unknown-linux-gnu"  # Linux ARM64
+  # "aarch64-unknown-linux-gnu"  # Linux ARM64
 )
 
 # Compile for each target
