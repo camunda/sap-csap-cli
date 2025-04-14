@@ -118,9 +118,8 @@ jobs:
       - name: unzip signed and notarized files
         run: |
           cd dist
-          ls -al ./
           ditto -xk signed.zip .
-          ls -al ./
+          chmod +x macos/*
           mv macos/* ./
           rm -rf macos
           rm -rf signed.zip
