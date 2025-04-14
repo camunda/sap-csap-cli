@@ -121,7 +121,9 @@ jobs:
           ls -al ./
           ditto -xk signed.zip .
           ls -al ./
+          mv macos/* ./
           rm -rf macos
+          rm -rf signed.zip
 
       - name: create gh release
         uses: ncipollo/release-action@v1
