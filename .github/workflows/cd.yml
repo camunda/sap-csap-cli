@@ -118,9 +118,9 @@ jobs:
       - name: unzip signed and notarized files
         run: |
           cd dist
-          ls -al dist/
+          ls -al ./
           ditto -xk signed.zip .
-          ls -al dist/
+          ls -al ./
           rm -rf macos
 
       - name: create gh release
