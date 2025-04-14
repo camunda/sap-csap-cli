@@ -117,10 +117,10 @@ jobs:
 
       - name: unzip signed and notarized files
         run: |
-          cd dist/macos
+          cd dist
+          ls -al dist/
           ditto -xk signed.zip .
-          mv csap-* ../
-          cd ..
+          ls -al dist/
           rm -rf macos
 
       - name: create gh release
