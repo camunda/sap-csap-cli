@@ -63,7 +63,7 @@ sign_macho_in_folder() {
       fi
       if file -b "$candidate" | grep -q "Mach-O"; then
         echo "    Signing Mach-O: $candidate"
-        if codesign --preserve-metadata=entitlements --entitlements=./entitlements.xml --verbose=4 --force --options runtime --timestamp --sign "$CERT_NAME" "$candidate"; then
+        if codesign --preserve-metadata=entitlements --entitlements=${GITHUB_WORKSPACE}/.github/actions/sign-and-notarize/entitlements.xml --verbose=4 --force --options runtime --timestamp --sign "$CERT_NAME" "$candidate"; then
           ((signed_count++))
         else
           echo "[Error] Mach-O sign failed: $candidate"
