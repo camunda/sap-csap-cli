@@ -1,9 +1,6 @@
 import { Ask } from "@sallai/ask"
 const ask = new Ask()
 
-import { btpPlugin } from "./modules/btp_plugin.ts"
-import { odataConnector } from "./modules/odata_connector.ts"
-import { rfcConnector } from "./modules/rfc_connector.ts"
 import {
   camundaDeploymentOptions,
   camundaVersions,
@@ -12,8 +9,11 @@ import {
 import {
   detectCredentials,
   getCredentials,
-  getCredentialsFromEnv,
+  getCredentialsFromEnv
 } from "../lib/credentials.ts"
+import { btpPlugin } from "./modules/btp_plugin.ts"
+import { odataConnector } from "./modules/odata_connector.ts"
+import { rfcConnector } from "./modules/rfc_connector.ts"
 
 export async function setupHandler(argv: any) {
   const sapIntegrationModule = argv.for ||
