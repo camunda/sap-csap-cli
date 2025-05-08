@@ -50,7 +50,7 @@ export async function setupHandler(argv: any) {
             return true
           }
         },
-        default: "camunda-btp-plugin.https://evangelist-camunda-sap.cfapps.eu10-004.hana.ondemand.com",
+        default: "camunda-btp-plugin.cfapps.eu10-004.hana.ondemand.com",
       })).btpRoute
     : "n/a"
 
