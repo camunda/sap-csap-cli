@@ -6,7 +6,7 @@ console.log(
 Welcome to csap - Camunda’s SAP Integration CLI`,
 )
 console.log(
-  "https://docs.camunda.io/docs/components/camunda-integrations/sap/csap-cli.md",
+  "https://docs.camunda.io/docs/components/camunda-integrations/sap/csap-cli/",
 )
 console.log(
   ` 
