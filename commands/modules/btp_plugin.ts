@@ -1,4 +1,5 @@
 import * as path from "jsr:@std/path"
+import * as url from 'node:url'
 import { clone, isRepoModified } from "../../lib/common.ts"
 import { CamundaCredentials } from "../../lib/credentials.ts"
 
@@ -13,8 +14,10 @@ export async function btpPlugin(
   console.log("")
   console.log("%c//> BTP Plugin setup", "color:orange")
 
+  const osTmpDir = Deno.env.get("TMPDIR") || Deno.env.get("TMP") ||
+    Deno.env.get("TEMP") || "/tmp"
   const to = path.join(
-    Deno.env.get("TMPDIR") || "/tmp",
+    osTmpDir,
     "camunda",
     camundaVersion,
     "sap-btp-plugin",
@@ -29,7 +32,10 @@ export async function btpPlugin(
   )
 
   if (!directoryExists) {
+    const isWindows = (Deno.env.get("OS")?.toLowerCase().includes("windows") ?? false)
+    if (!isWindows) {
     await Deno.mkdir(to, { recursive: true })
+    }
     await _clone(to)
   } else {
     console.log(`i target directory ${to} already exists`)
