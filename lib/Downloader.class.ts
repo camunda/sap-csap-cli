@@ -2,6 +2,7 @@ import { Octokit } from "https://esm.sh/octokit?dts";
 import * as path from "jsr:@std/path";
 import { GetResponseTypeFromEndpointMethod } from "npm:@octokit/types";
 import { Kind } from "./common.ts"; // Import Kind from common.ts
+import { createBuildDir } from "../commands/modules/createBuildDir.ts";
 
 const octokit = new Octokit({
   userAgent: "csap",
@@ -29,7 +30,7 @@ export class Downloader {
     module: (typeof Kind)[keyof typeof Kind], //> e.g. "sap-odata-connector"
     version: `${number}.${number}`, //> c8 release, e.g. 8.7
   ) {
-    this.to = path.join(Deno.env.get("TMPDIR") || "/tmp", "camunda")
+    this.to = createBuildDir() 
     this.for = {
       module,
       version,
