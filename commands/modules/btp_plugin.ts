@@ -34,7 +34,7 @@ export async function btpPlugin(
   if (!directoryExists) {
     const isWindows = (Deno.env.get("OS")?.toLowerCase().includes("windows") ?? false)
     if (!isWindows) {
-    await Deno.mkdir(to, { recursive: true })
+      await Deno.mkdir(to, { recursive: true })
     }
     await _clone(to)
   } else {
@@ -119,7 +119,9 @@ async function build(
   Deno.copyFileSync("./mta.yaml.example", "./mta.yaml")
   Deno.copyFileSync("./xs-security.json.example", "./xs-security.json")
 
-  const btpPluginVersion = (await import(path.join(inDir, "package.json"), {
+  const pkgJson = url.pathToFileURL(path.join(inDir, "package.json")).href
+
+  const btpPluginVersion = (await import(pkgJson, {
     with: { type: "json" },
   })).default.version
 
