@@ -204,7 +204,6 @@ function injectVersion(
 }
 function injectRoute(route: string) {
   // note: this is the full host name, including hana.ondemand.com
-  _replace("./xs-security.json", "<btp-plugin-route>", route)
   _replace("./mta.yaml", "<btp-plugin-route>", route)
 }
 function injectCredentials(
