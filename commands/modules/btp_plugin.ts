@@ -2,6 +2,7 @@ import * as path from "jsr:@std/path"
 import * as url from 'node:url'
 import { clone, isRepoModified } from "../../lib/common.ts"
 import { CamundaCredentials } from "../../lib/credentials.ts"
+import { createBuildDir } from "./createBuildDir.ts"
 
 export async function btpPlugin(
   { camundaVersion, camundaDeployment, credentials, btpRoute }: {
@@ -14,14 +15,7 @@ export async function btpPlugin(
   console.log("")
   console.log("%c//> BTP Plugin setup", "color:orange")
 
-  const osTmpDir = Deno.env.get("TMPDIR") || Deno.env.get("TMP") ||
-    Deno.env.get("TEMP") || "/tmp"
-  const to = path.join(
-    osTmpDir,
-    "camunda",
-    camundaVersion,
-    "sap-btp-plugin",
-  )
+  const to = createBuildDir(camundaVersion)
 
   // check for
   // - existing target directory
