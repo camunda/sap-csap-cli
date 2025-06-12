@@ -1,6 +1,8 @@
 import * as path from "jsr:@std/path"
+import * as url from 'node:url'
 import { clone, isRepoModified } from "../../lib/common.ts"
 import { CamundaCredentials } from "../../lib/credentials.ts"
+import { createBuildDir } from "./createBuildDir.ts"
 
 export async function btpPlugin(
   { camundaVersion, camundaDeployment, credentials, btpRoute }: {
@@ -13,12 +15,7 @@ export async function btpPlugin(
   console.log("")
   console.log("%c//> BTP Plugin setup", "color:orange")
 
-  const to = path.join(
-    Deno.env.get("TMPDIR") || "/tmp",
-    "camunda",
-    camundaVersion,
-    "sap-btp-plugin",
-  )
+  const to = createBuildDir(camundaVersion)
 
   // check for
   // - existing target directory
@@ -29,7 +26,10 @@ export async function btpPlugin(
   )
 
   if (!directoryExists) {
-    await Deno.mkdir(to, { recursive: true })
+    const isWindows = (Deno.env.get("OS")?.toLowerCase().includes("windows") ?? false)
+    if (!isWindows) {
+      await Deno.mkdir(to, { recursive: true })
+    }
     await _clone(to)
   } else {
     console.log(`i target directory ${to} already exists`)
@@ -113,7 +113,9 @@ async function build(
   Deno.copyFileSync("./mta.yaml.example", "./mta.yaml")
   Deno.copyFileSync("./xs-security.json.example", "./xs-security.json")
 
-  const btpPluginVersion = (await import(path.join(inDir, "package.json"), {
+  const pkgJson = url.pathToFileURL(path.join(inDir, "package.json")).href
+
+  const btpPluginVersion = (await import(pkgJson, {
     with: { type: "json" },
   })).default.version
 
@@ -196,7 +198,6 @@ function injectVersion(
 }
 function injectRoute(route: string) {
   // note: this is the full host name, including hana.ondemand.com
-  _replace("./xs-security.json", "<btp-plugin-route>", route)
   _replace("./mta.yaml", "<btp-plugin-route>", route)
 }
 function injectCredentials(
