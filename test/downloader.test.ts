@@ -10,13 +10,17 @@ import { Downloader } from "../lib/Downloader.class.ts"
 import { Kind } from "../lib/common.ts"
 
 Deno.test("should return a list of releases", async () => {
-  const releases = await new Downloader(Kind.odata, "8.6")
+  const releases = await new Downloader(
+    Kind.odata,
+    "8.6",
+    Deno.makeTempDirSync(),
+  )
     .getReleases()
   assertGreaterOrEqual(releases.length, 1)
 })
 
 Deno.test("should return the latest release", async () => {
-  const downloader = new Downloader(Kind.rfc, "8.6")
+  const downloader = new Downloader(Kind.rfc, "8.6", Deno.makeTempDirSync())
   const latestRelease = await downloader.getLatestRelease()
   await new Promise((resolve) => setTimeout(resolve, 100)) //> ...
   assertInstanceOf(latestRelease, Object)
@@ -31,7 +35,7 @@ Deno.test("should return the latest release", async () => {
 })
 
 Deno.test("should download assets for a module", async () => {
-  const downloader = new Downloader(Kind.odata, "8.6")
+  const downloader = new Downloader(Kind.odata, "8.6", Deno.makeTempDirSync())
   await downloader.pullAssets()
   const result = []
   for await (const dirEntry of walk(downloader.to)) {
