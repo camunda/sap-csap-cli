@@ -15,7 +15,6 @@ export function createBuildDir(camundaVersion?: string): string {
       osTmpDir,
       "camunda",
       camundaVersion,
-      "sap-btp-plugin",
     )
   } else {
     return join(osTmpDir, "camunda")

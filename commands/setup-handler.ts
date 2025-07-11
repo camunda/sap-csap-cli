@@ -59,7 +59,7 @@ export async function setupHandler(argv: any) {
     (await ask.input({
       name: "to",
       message: "Target directory for setup artifacts",
-      default: createBuildDir(),
+      default: createBuildDir(camundaVersion),
     })).to
 
   let clusterId, region, clientId, clientSecret

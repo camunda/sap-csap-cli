@@ -2,7 +2,6 @@ import { Octokit } from "https://esm.sh/octokit?dts";
 import { join, basename } from "jsr:@std/path";
 import { GetResponseTypeFromEndpointMethod } from "npm:@octokit/types";
 import { Kind } from "./common.ts"; // Import Kind from common.ts
-import { createBuildDir } from "../commands/modules/createBuildDir.ts";
 
 const octokit = new Octokit({
   userAgent: "csap",
@@ -31,7 +30,7 @@ export class Downloader {
     version: `${number}.${number}`, //> c8 release, e.g. 8.7
     to: string, //> target directory
   ) {
-    this.to = to 
+    this.to = to
     this.for = {
       module,
       version,

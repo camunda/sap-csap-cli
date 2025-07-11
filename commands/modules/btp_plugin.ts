@@ -2,7 +2,6 @@ import { join } from "jsr:@std/path"
 import * as url from 'node:url'
 import { clone, isRepoModified } from "../../lib/common.ts"
 import { CamundaCredentials } from "../../lib/credentials.ts"
-import { createBuildDir } from "./createBuildDir.ts"
 
 export async function btpPlugin(
   { camundaVersion, camundaDeployment, credentials, btpRoute, to }: {
@@ -16,7 +15,7 @@ export async function btpPlugin(
   console.log("")
   console.log("%c//> BTP Plugin setup", "color:orange")
 
-  const to = createBuildDir(camundaVersion)
+  to = join(to, "sap-btp-plugin")
 
   // check for
   // - existing target directory
