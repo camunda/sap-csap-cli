@@ -1,4 +1,4 @@
-import * as path from "jsr:@std/path"
+import { join } from "jsr:@std/path"
 
 /**
  * Create the build directory path for the BTP plugin setup.
@@ -11,13 +11,13 @@ export function createBuildDir(camundaVersion?: string): string {
   const osTmpDir = Deno.env.get("TMPDIR") || Deno.env.get("TMP") ||
     Deno.env.get("TEMP") || "/tmp"
   if (camundaVersion) {
-    return path.join(
+    return join(
       osTmpDir,
       "camunda",
       camundaVersion,
       "sap-btp-plugin",
     )
   } else {
-    return path.join(osTmpDir, "camunda")
+    return join(osTmpDir, "camunda")
   }
 }

@@ -11,6 +11,7 @@ import {
   getCredentials,
   getCredentialsFromEnv
 } from "../lib/credentials.ts"
+import { createBuildDir } from "./modules/createBuildDir.ts"
 import { btpPlugin } from "./modules/btp_plugin.ts"
 import { odataConnector } from "./modules/odata_connector.ts"
 import { rfcConnector } from "./modules/rfc_connector.ts"
@@ -53,6 +54,13 @@ export async function setupHandler(argv: any) {
         default: "camunda-btp-plugin.cfapps.eu10-004.hana.ondemand.com",
       })).btpRoute
     : "n/a"
+
+  const to = argv.to ||
+    (await ask.input({
+      name: "to",
+      message: "Target directory for setup artifacts",
+      default: createBuildDir(),
+    })).to
 
   let clusterId, region, clientId, clientSecret
   if (
@@ -97,6 +105,7 @@ export async function setupHandler(argv: any) {
         camundaVersion,
         camundaDeployment,
         credentials,
+        to,
       }
       await odataConnector(options)
       await rfcConnector(options)
@@ -112,6 +121,7 @@ export async function setupHandler(argv: any) {
         camundaDeployment,
         credentials,
         btpRoute,
+        to,
       })
       break
     case "odata":
@@ -119,6 +129,7 @@ export async function setupHandler(argv: any) {
         camundaVersion,
         camundaDeployment,
         credentials,
+        to,
       })
       break
     case "rfc":
@@ -126,6 +137,7 @@ export async function setupHandler(argv: any) {
         camundaVersion,
         camundaDeployment,
         credentials,
+        to,
       })
       break
     default:

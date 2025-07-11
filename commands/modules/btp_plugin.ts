@@ -1,15 +1,16 @@
-import * as path from "jsr:@std/path"
+import { join } from "jsr:@std/path"
 import * as url from 'node:url'
 import { clone, isRepoModified } from "../../lib/common.ts"
 import { CamundaCredentials } from "../../lib/credentials.ts"
 import { createBuildDir } from "./createBuildDir.ts"
 
 export async function btpPlugin(
-  { camundaVersion, camundaDeployment, credentials, btpRoute }: {
+  { camundaVersion, camundaDeployment, credentials, btpRoute, to }: {
     camundaVersion: `${number}.${number}`
     camundaDeployment: string
     credentials: CamundaCredentials
     btpRoute: string
+    to: string
   },
 ) {
   console.log("")
@@ -72,7 +73,7 @@ async function _clone(to: string) {
 }
 
 async function previousBuildExists(dir: string) {
-  const mtaDir = path.join(dir, "mta_archives")
+  const mtaDir = join(dir, "mta_archives")
   const mtarFiles = []
   if (await Deno.stat(mtaDir).then(() => true).catch(() => false)) {
     for await (const entry of Deno.readDir(mtaDir)) {
@@ -113,7 +114,7 @@ async function build(
   Deno.copyFileSync("./mta.yaml.example", "./mta.yaml")
   Deno.copyFileSync("./xs-security.json.example", "./xs-security.json")
 
-  const pkgJson = url.pathToFileURL(path.join(inDir, "package.json")).href
+  const pkgJson = url.pathToFileURL(join(inDir, "package.json")).href
 
   const btpPluginVersion = (await import(pkgJson, {
     with: { type: "json" },
@@ -156,7 +157,7 @@ async function build(
     `🛠️ successfully built BTP Plugin\n\tfor Camunda ${camundaDeployment} ${camundaVersion}\n\tin directory ${inDir}`,
   )
 
-  const mtarDir = path.join(inDir, "mta_archives")
+  const mtarDir = join(inDir, "mta_archives")
   const mtars = []
   if (await Deno.stat(mtarDir).then(() => true).catch(() => false)) {
     for await (const entry of Deno.readDir(mtarDir)) {

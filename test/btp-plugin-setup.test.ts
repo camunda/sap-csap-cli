@@ -83,3 +83,72 @@ for (const version of VERSIONS) {
     assertStringIncludes(xsSec, mangled)
   })
 }
+
+Deno.test({
+  name: "BTP Plugin setup: custom 'to' directory parameter works correctly",
+  sanitizeResources: false,
+  sanitizeOps: false,
+  async fn() {
+    const version = "8.7"
+    const customBuildDir = await Deno.makeTempDir({ prefix: "csap-test-custom-" })
+    
+    try {
+      const cmd = [
+        "deno",
+        "run",
+        "-A",
+        "cli.ts",
+        "setup",
+        "--for",
+        "btp-plugin",
+        "--deployment",
+        "SaaS",
+        "--camunda",
+        version,
+        "--btpRoute",
+        ROUTE,
+        "--clusterId",
+        CLUSTER_ID,
+        "--region",
+        REGION,
+        "--clientId",
+        CLIENT_ID,
+        "--clientSecret",
+        CLIENT_SECRET,
+        "--to",
+        customBuildDir,
+      ]
+      const process = new Deno.Command(cmd[0], {
+        args: cmd.slice(1),
+        stdout: "piped",
+        stderr: "piped",
+      })
+      const { code, stdout, stderr } = await process.output()
+      const out = new TextDecoder().decode(stdout)
+      const err = new TextDecoder().decode(stderr)
+      
+      assertEquals(
+        code,
+        0,
+        `Command failed with code ${code}. STDOUT: ${out}. STDERR: ${err}`,
+      )
+      
+      // Verify that the custom directory was used (check for mta_archives subdirectory)
+      const mtaArchivesPath = join(customBuildDir, "mta_archives")
+      const mtaArchivesExists = await Deno.stat(mtaArchivesPath).then(() => true).catch(() => false)
+      assert(mtaArchivesExists, `Expected mta_archives directory to exist in custom path: ${mtaArchivesPath}`)
+      
+      // Verify that mtad.yaml was created in the custom directory
+      const mtadPath = join(customBuildDir, "mtad.yaml")
+      const mtadExists = await Deno.stat(mtadPath).then(() => true).catch(() => false)
+      assert(mtadExists, `Expected mtad.yaml to exist in custom path: ${mtadPath}`)
+    } finally {
+      // Clean up the custom directory
+      try {
+        await Deno.remove(customBuildDir, { recursive: true })
+      } catch {
+        // Ignore cleanup errors
+      }
+    }
+  },
+})
