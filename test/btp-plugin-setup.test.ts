@@ -1,6 +1,5 @@
 import { assert, assertEquals, assertStringIncludes } from "jsr:@std/assert"
 import { join } from "jsr:@std/path"
-import { createBuildDir } from "../commands/modules/createBuildDir.ts"
 
 const VERSIONS = ["8.7", "8.6", "8.5"]
 const ROUTE = "my-route.example.org"
@@ -9,16 +8,16 @@ const REGION = "region-1"
 const CLIENT_ID = "abcdefg"
 const CLIENT_SECRET = "qwerty"
 
-const buildDir = await Deno.makeTempDir({ prefix: "csap-test-custom-" })
-
-Deno.test({
-  name:
-    "BTP Plugin setup: cli runs and creates .mtar archive for each Camunda version" +
-    VERSIONS.join(", "),
-  sanitizeResources: false,
-  sanitizeOps: false,
-  async fn() {
-    for (const version of VERSIONS) {
+for (const version of VERSIONS) {
+  const buildDir = await Deno.makeTempDir({
+    prefix: `csap-test-custom-${crypto.randomUUID()}`,
+  })
+  Deno.test({
+    name:
+      `BTP Plugin setup: cli runs and creates .mtar archive for each Camunda version ${version}`,
+    sanitizeResources: false,
+    sanitizeOps: false,
+    async fn() {
       const cmd = [
         "deno",
         "run",
@@ -68,11 +67,9 @@ Deno.test({
         }
       }
       assert(foundMtar, `No .mtar file found in ${mtaArchives}`)
-    }
-  },
-})
+    },
+  })
 
-for (const version of VERSIONS) {
   Deno.test(
     `mta.yaml contains correct route and credentials for version ${version}`,
     async () => {
