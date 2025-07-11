@@ -9,6 +9,8 @@ const REGION = "region-1"
 const CLIENT_ID = "abcdefg"
 const CLIENT_SECRET = "qwerty"
 
+const buildDir = await Deno.makeTempDir({ prefix: "csap-test-custom-" })
+
 Deno.test({
   name:
     "BTP Plugin setup: cli runs and creates .mtar archive for each Camunda version" +
@@ -17,7 +19,6 @@ Deno.test({
   sanitizeOps: false,
   async fn() {
     for (const version of VERSIONS) {
-      const buildDir = await Deno.makeTempDir({ prefix: "csap-test-custom-" })
       const cmd = [
         "deno",
         "run",
@@ -72,17 +73,19 @@ Deno.test({
 })
 
 for (const version of VERSIONS) {
-  const buildDir = createBuildDir(version)
-  Deno.test(`mta.yaml contains correct route and credentials for version ${version}`, async () => {
-    const mtaYaml = await Deno.readTextFile(
-      join(buildDir, "sap-btp-plugin", "mta.yaml"),
-    )
-    assertStringIncludes(mtaYaml, ROUTE)
-    assertStringIncludes(mtaYaml, CLUSTER_ID)
-    assertStringIncludes(mtaYaml, REGION)
-    assertStringIncludes(mtaYaml, CLIENT_ID)
-    assertStringIncludes(mtaYaml, CLIENT_SECRET)
-  })
+  Deno.test(
+    `mta.yaml contains correct route and credentials for version ${version}`,
+    async () => {
+      const mtaYaml = await Deno.readTextFile(
+        join(buildDir, "sap-btp-plugin", "mta.yaml"),
+      )
+      assertStringIncludes(mtaYaml, ROUTE)
+      assertStringIncludes(mtaYaml, CLUSTER_ID)
+      assertStringIncludes(mtaYaml, REGION)
+      assertStringIncludes(mtaYaml, CLIENT_ID)
+      assertStringIncludes(mtaYaml, CLIENT_SECRET)
+    },
+  )
   Deno.test(`xs-security.json contains mangled version for version ${version}`, async () => {
     const xsSec = await Deno.readTextFile(
       join(buildDir, "sap-btp-plugin", "xs-security.json"),
