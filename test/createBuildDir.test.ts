@@ -1,5 +1,4 @@
 import { assertEquals, assertStringIncludes } from "jsr:@std/assert"
-import { join } from "jsr:@std/path"
 import { createBuildDir } from "../commands/modules/createBuildDir.ts"
 
 Deno.test("createBuildDir - returns base directory when no camundaVersion provided", () => {
@@ -30,7 +29,7 @@ Deno.test("createBuildDir - defaults to /tmp when no env vars set", () => {
     Deno.env.delete("TEMP")
 
     const result = createBuildDir()
-    assertStringIncludes(result, "/tmp")
+    assertStringIncludes(result, "tmp") //> ignore the os-dependent \ or /
     assertStringIncludes(result, "camunda")
   } finally {
     // Restore original env
