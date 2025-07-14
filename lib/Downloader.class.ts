@@ -1,8 +1,7 @@
 import { Octokit } from "https://esm.sh/octokit?dts";
-import * as path from "jsr:@std/path";
+import { join, basename } from "jsr:@std/path";
 import { GetResponseTypeFromEndpointMethod } from "npm:@octokit/types";
 import { Kind } from "./common.ts"; // Import Kind from common.ts
-import { createBuildDir } from "../commands/modules/createBuildDir.ts";
 
 const octokit = new Octokit({
   userAgent: "csap",
@@ -29,8 +28,9 @@ export class Downloader {
   constructor(
     module: (typeof Kind)[keyof typeof Kind], //> e.g. "sap-odata-connector"
     version: `${number}.${number}`, //> c8 release, e.g. 8.7
+    to: string, //> target directory
   ) {
-    this.to = createBuildDir() 
+    this.to = to
     this.for = {
       module,
       version,
@@ -137,7 +137,7 @@ export class Downloader {
         Deno.stdout.write(
           new TextEncoder().encode(
             `i File already exists: ${
-              path.basename(filePath)
+              basename(filePath)
             } - skipping download\n`,
           ),
         )
@@ -163,7 +163,7 @@ export class Downloader {
     asset: typeof this.latestRelease["assets"][number],
     dir: string,
   ): Promise<void> {
-    const filePath = path.join(dir, asset.name)
+    const filePath = join(dir, asset.name)
     const response = await fetch(asset.browser_download_url)
 
     if (!response.ok) {
@@ -180,7 +180,7 @@ export class Downloader {
       await this.getLatestRelease()
     }
     // <tmpdir>/camunda/8.6/sap-odata-connector/8.6.1/**/*
-    const dir = path.join(
+    const dir = join(
       this.to,
       this.for.version,
       this.for.module,
@@ -195,7 +195,7 @@ export class Downloader {
       ),
     )
     for (const asset of this.latestRelease.assets) {
-      const filePath = path.join(dir, asset.name)
+      const filePath = join(dir, asset.name)
       if (await this.fileExists(filePath, asset)) continue
       await this.downloadAsset(asset, dir)
     }

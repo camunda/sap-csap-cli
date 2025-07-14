@@ -8,7 +8,7 @@ import { setupHandler } from "./setup-handler.ts"
 
 export const setupCommand = {
   command:
-    `setup [for] [camunda] [deployment] [clusterId] [region] [clientId] [clientSecret] [btpRoute]`,
+    `setup [for] [camunda] [deployment] [clusterId] [region] [clientId] [clientSecret] [btpRoute] [to]`,
   describe: "prepare one of Camunda's SAP Integration modules for deployment",
   builder: (yargs: YargsInstance) => {
     return yargs
@@ -50,6 +50,10 @@ export const setupCommand = {
       .option("clientSecret", {
         type: "string",
         description: "Camunda API Client: OAuth2 client secret",
+      })
+      .option("to", {
+        type: "string",
+        description: "Target directory for setup artifacts (defaults to $tmp directory)",
       })
   },
   handler: setupHandler,
