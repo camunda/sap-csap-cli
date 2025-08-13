@@ -1,5 +1,6 @@
 import { join } from "jsr:@std/path"
-import * as url from 'node:url'
+import { resolve } from "node:path"
+import * as url from "node:url"
 import { clone, isRepoModified } from "../../lib/common.ts"
 import { CamundaCredentials } from "../../lib/credentials.ts"
 
@@ -15,8 +16,6 @@ export async function btpPlugin(
   console.log("")
   console.log("%c//> BTP Plugin setup", "color:orange")
 
-  to = join(to, "sap-btp-plugin")
-
   // check for
   // - existing target directory
   // - integrity of the repository
@@ -26,7 +25,8 @@ export async function btpPlugin(
   )
 
   if (!directoryExists) {
-    const isWindows = (Deno.env.get("OS")?.toLowerCase().includes("windows") ?? false)
+    const isWindows = Deno.env.get("OS")?.toLowerCase().includes("windows") ??
+      false
     if (!isWindows) {
       await Deno.mkdir(to, { recursive: true })
     }
@@ -51,7 +51,7 @@ export async function btpPlugin(
   }
 
   await build({
-    inDir: to,
+    inDir: resolve(to), // so that Deno.chdir works as expected
     camundaDeployment,
     camundaVersion,
     credentials,
