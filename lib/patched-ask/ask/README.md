@@ -37,35 +37,39 @@ Then just create an `Ask` instance and use the `prompt()` method to enumerate
 your questions.
 
 ```ts
-import { Ask } from "@sallai/ask";
+import { Ask } from "@sallai/ask"
 
-const ask = new Ask(); // global options are also supported!
+const ask = new Ask() // global options are also supported!
 
-const answers = await ask.prompt([
-  {
-    name: "name",
-    type: "input",
-    message: "Name:",
-  },
-  {
-    name: "age",
-    type: "number",
-    message: "Age:",
-  },
-] as const);
+const answers = await ask.prompt(
+  [
+    {
+      name: "name",
+      type: "input",
+      message: "Name:",
+    },
+    {
+      name: "age",
+      type: "number",
+      message: "Age:",
+    },
+  ] as const,
+)
 
-console.log(answers); // { name: "Joe", age: 19 }
+console.log(answers) // { name: "Joe", age: 19 }
 ```
 
 You can also just ask a single question:
 
 ```ts
-const { name } = await ask.input({
-  name: "name",
-  message: "Name:",
-} as const);
+const { name } = await ask.input(
+  {
+    name: "name",
+    message: "Name:",
+  } as const,
+)
 
-console.log(name); // Joe
+console.log(name) // Joe
 ```
 
 > **Note:** The `as const` assertion is necessary to ensure that the `name`
