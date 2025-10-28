@@ -22,9 +22,9 @@ export function step(message: string) {
 }
 
 export const camundaVersions = [
+  { message: "8.8", value: "8.8" },
   { message: "8.7", value: "8.7" },
   { message: "8.6", value: "8.6" },
-  { message: "8.5", value: "8.5" },
 ]
 
 export const camundaDeploymentOptions = [
