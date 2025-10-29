@@ -1,11 +1,11 @@
-import { Octokit } from "https://esm.sh/octokit?dts";
-import { join, basename } from "jsr:@std/path";
-import { GetResponseTypeFromEndpointMethod } from "npm:@octokit/types";
-import { Kind } from "./common.ts"; // Import Kind from common.ts
+import { Octokit } from "https://esm.sh/octokit?dts"
+import { basename, join } from "jsr:@std/path"
+import { GetResponseTypeFromEndpointMethod } from "npm:@octokit/types"
+import { Kind } from "./common.ts"
 
 const octokit = new Octokit({
   userAgent: "csap",
-  auth: Deno.env.get("GH_TOKEN")
+  auth: Deno.env.get("GH_TOKEN"),
 })
 
 export class Downloader {
@@ -14,9 +14,7 @@ export class Downloader {
     GetResponseTypeFromEndpointMethod<typeof octokit.request>["data"][number]
   > = []
   latestRelease:
-    | GetResponseTypeFromEndpointMethod<
-      typeof octokit.request
-    >["data"][number]
+    | GetResponseTypeFromEndpointMethod<typeof octokit.request>["data"][number]
     | null = null
 
   for: {
@@ -31,6 +29,12 @@ export class Downloader {
     to: string, //> target directory
   ) {
     this.to = to
+    if (version === "8.8" && (module === Kind.odata || module === Kind.rfc)) {
+      const msg =
+        "! RFC- and OData-connector are currently only available for Camunda <= 8.7...\n! 8.8 support coming soon!"
+      console.log(`%c${msg}`, "color:red")
+      Deno.exit(1)
+    }
     this.for = {
       module,
       version,
@@ -92,7 +96,7 @@ export class Downloader {
   private async showProgress(
     response: Response,
     filePath: string,
-    asset: typeof this.latestRelease["assets"][number],
+    asset: (typeof this.latestRelease)["assets"][number],
   ) {
     const contentLength = Number(response.headers.get("content-length") || 0)
     const file = await Deno.open(filePath, { write: true, create: true })
@@ -129,7 +133,7 @@ export class Downloader {
 
   private async fileExists(
     filePath: string,
-    asset: typeof this.latestRelease["assets"][number],
+    asset: (typeof this.latestRelease)["assets"][number],
   ): Promise<boolean> {
     try {
       const fileInfo = await Deno.stat(filePath)
@@ -160,7 +164,7 @@ export class Downloader {
   }
 
   private async downloadAsset(
-    asset: typeof this.latestRelease["assets"][number],
+    asset: (typeof this.latestRelease)["assets"][number],
     dir: string,
   ): Promise<void> {
     const filePath = join(dir, asset.name)

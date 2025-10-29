@@ -1,13 +1,13 @@
-import type { GlobalPromptOpts } from "./core/base.ts";
-import type { Result } from "./core/result.ts";
+import type { GlobalPromptOpts } from "./core/base.ts"
+import type { Result } from "./core/result.ts"
 
-import { InputPrompt, type InputOpts } from "./handlers/input.ts";
-import { NumberPrompt, type NumberOpts } from "./handlers/number.ts";
-import { ConfirmPrompt, type ConfirmOpts } from "./handlers/confirm.ts";
-import { PasswordPrompt, type PasswordOpts } from "./handlers/password.ts";
-import { EditorPrompt, type EditorOpts } from "./handlers/editor.ts";
-import { SelectPrompt, type SelectOpts } from "./handlers/select.ts";
-import { CheckboxPrompt, type CheckboxOpts } from "./handlers/checkbox.ts";
+import { type InputOpts, InputPrompt } from "./handlers/input.ts"
+import { type NumberOpts, NumberPrompt } from "./handlers/number.ts"
+import { type ConfirmOpts, ConfirmPrompt } from "./handlers/confirm.ts"
+import { type PasswordOpts, PasswordPrompt } from "./handlers/password.ts"
+import { type EditorOpts, EditorPrompt } from "./handlers/editor.ts"
+import { type SelectOpts, SelectPrompt } from "./handlers/select.ts"
+import { type CheckboxOpts, CheckboxPrompt } from "./handlers/checkbox.ts"
 
 type SupportedOpts =
   | InputOpts
@@ -16,33 +16,32 @@ type SupportedOpts =
   | PasswordOpts
   | EditorOpts
   | SelectOpts
-  | CheckboxOpts;
+  | CheckboxOpts
 
 type PromptResult<O extends SupportedOpts> = O["type"] extends "input"
   ? Result<O extends InputOpts ? O : never, string>
   : O["type"] extends "number"
-  ? Result<O extends NumberOpts ? O : never, number>
+    ? Result<O extends NumberOpts ? O : never, number>
   : O["type"] extends "confirm"
-  ? Result<O extends ConfirmOpts ? O : never, boolean>
+    ? Result<O extends ConfirmOpts ? O : never, boolean>
   : O["type"] extends "password"
-  ? Result<O extends PasswordOpts ? O : never, string>
+    ? Result<O extends PasswordOpts ? O : never, string>
   : O["type"] extends "editor"
-  ? Result<O extends EditorOpts ? O : never, string>
+    ? Result<O extends EditorOpts ? O : never, string>
   : O["type"] extends "select"
-  ? // deno-lint-ignore no-explicit-any
-    Result<O extends SelectOpts ? O : never, any>
+  // deno-lint-ignore no-explicit-any
+    ? Result<O extends SelectOpts ? O : never, any>
   : O["type"] extends "checkbox"
-  ? // deno-lint-ignore no-explicit-any
-    Result<O extends CheckboxOpts ? O : never, any[]>
-  : never;
+  // deno-lint-ignore no-explicit-any
+    ? Result<O extends CheckboxOpts ? O : never, any[]>
+  : never
 
 type PromptResultMap<T extends Array<SupportedOpts>> = {
   [K in T[number] as K["name"]]: PromptResult<K> extends infer R
-    ? R extends Record<string, unknown>
-      ? R[K["name"]]
-      : never
-    : never;
-};
+    ? R extends Record<string, unknown> ? R[K["name"]]
+    : never
+    : never
+}
 
 /**
  * @class
@@ -50,7 +49,7 @@ type PromptResultMap<T extends Array<SupportedOpts>> = {
  * prompts easily.
  */
 export class Ask {
-  private opts: GlobalPromptOpts;
+  private opts: GlobalPromptOpts
 
   /**
    * @constructor
@@ -59,11 +58,11 @@ export class Ask {
    * @param opts
    */
   constructor(opts?: GlobalPromptOpts) {
-    this.opts = opts ?? {};
+    this.opts = opts ?? {}
   }
 
   private mergeOptions<T>(opts: Omit<SupportedOpts, "type">): T {
-    return { ...this.opts, ...opts } as T;
+    return { ...this.opts, ...opts } as T
   }
 
   /**
@@ -85,7 +84,7 @@ export class Ask {
    * console.log(name);
    */
   input<T extends InputOpts>(opts: T): Promise<Result<T, string | undefined>> {
-    return new InputPrompt(this.mergeOptions(opts) as T).run();
+    return new InputPrompt(this.mergeOptions(opts) as T).run()
   }
 
   /**
@@ -111,9 +110,9 @@ export class Ask {
    * console.log(age);
    */
   number<T extends NumberOpts>(
-    opts: T
+    opts: T,
   ): Promise<Result<T, number | undefined>> {
-    return new NumberPrompt(this.mergeOptions(opts) as T).run();
+    return new NumberPrompt(this.mergeOptions(opts) as T).run()
   }
 
   /**
@@ -138,9 +137,9 @@ export class Ask {
    * console.log(canDrive);
    */
   confirm<T extends ConfirmOpts>(
-    opts: T
+    opts: T,
   ): Promise<Result<T, boolean | undefined>> {
-    return new ConfirmPrompt(this.mergeOptions(opts) as T).run();
+    return new ConfirmPrompt(this.mergeOptions(opts) as T).run()
   }
 
   /**
@@ -166,9 +165,9 @@ export class Ask {
    * console.log(password);
    */
   password<T extends PasswordOpts>(
-    opts: T
+    opts: T,
   ): Promise<Result<T, string | undefined>> {
-    return new PasswordPrompt(this.mergeOptions(opts) as T).run();
+    return new PasswordPrompt(this.mergeOptions(opts) as T).run()
   }
 
   /**
@@ -196,9 +195,9 @@ export class Ask {
    * console.log(content);
    */
   editor<T extends EditorOpts>(
-    opts: T
+    opts: T,
   ): Promise<Result<T, string | undefined>> {
-    return new EditorPrompt(this.mergeOptions(opts) as T).run();
+    return new EditorPrompt(this.mergeOptions(opts) as T).run()
   }
 
   /**
@@ -231,7 +230,7 @@ export class Ask {
    */
   // deno-lint-ignore no-explicit-any
   select<T extends SelectOpts>(opts: T): Promise<Result<T, any>> {
-    return new SelectPrompt(this.mergeOptions(opts) as T).run();
+    return new SelectPrompt(this.mergeOptions(opts) as T).run()
   }
 
   /**
@@ -266,7 +265,7 @@ export class Ask {
    */
   // deno-lint-ignore no-explicit-any
   checkbox<T extends CheckboxOpts>(opts: T): Promise<Result<T, any[]>> {
-    return new CheckboxPrompt(this.mergeOptions(opts) as CheckboxOpts).run();
+    return new CheckboxPrompt(this.mergeOptions(opts) as CheckboxOpts).run()
   }
 
   /**
@@ -307,53 +306,53 @@ export class Ask {
    * console.log(answers.canDrive); // will be a boolean
    */
   async prompt<T extends Array<SupportedOpts>>(
-    questions: T
+    questions: T,
   ): Promise<PromptResultMap<T>> {
     // deno-lint-ignore no-explicit-any
-    const answers: PromptResultMap<any> = {};
+    const answers: PromptResultMap<any> = {}
 
     for (let i = 0; i < questions.length; ++i) {
-      const question = questions[i];
+      const question = questions[i]
 
       switch (question.type) {
         case "input": {
-          const input = new InputPrompt(question);
-          Object.assign(answers, await input.run());
-          break;
+          const input = new InputPrompt(question)
+          Object.assign(answers, await input.run())
+          break
         }
         case "number": {
-          const number = new NumberPrompt(question as NumberOpts);
-          Object.assign(answers, await number.run());
-          break;
+          const number = new NumberPrompt(question as NumberOpts)
+          Object.assign(answers, await number.run())
+          break
         }
         case "confirm": {
-          const confirm = new ConfirmPrompt(question as ConfirmOpts);
-          Object.assign(answers, await confirm.run());
-          break;
+          const confirm = new ConfirmPrompt(question as ConfirmOpts)
+          Object.assign(answers, await confirm.run())
+          break
         }
         case "password": {
-          const password = new PasswordPrompt(question);
-          Object.assign(answers, await password.run());
-          break;
+          const password = new PasswordPrompt(question)
+          Object.assign(answers, await password.run())
+          break
         }
         case "editor": {
-          const editor = new EditorPrompt(question as EditorOpts);
-          Object.assign(answers, await editor.run());
-          break;
+          const editor = new EditorPrompt(question as EditorOpts)
+          Object.assign(answers, await editor.run())
+          break
         }
         case "select": {
-          const select = new SelectPrompt(question as SelectOpts);
-          Object.assign(answers, await select.run());
-          break;
+          const select = new SelectPrompt(question as SelectOpts)
+          Object.assign(answers, await select.run())
+          break
         }
         case "checkbox": {
-          const checkbox = new CheckboxPrompt(question as CheckboxOpts);
-          Object.assign(answers, await checkbox.run());
-          break;
+          const checkbox = new CheckboxPrompt(question as CheckboxOpts)
+          Object.assign(answers, await checkbox.run())
+          break
         }
       }
     }
 
-    return answers as PromptResultMap<T>;
+    return answers as PromptResultMap<T>
   }
 }

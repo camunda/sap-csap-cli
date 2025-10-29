@@ -57,7 +57,8 @@ export const setupCommand = {
       })
       .option("to", {
         type: "string",
-        description: "Target directory for setup artifacts (defaults to $tmp directory)",
+        description:
+          "Target directory for setup artifacts (defaults to $tmp directory)",
       })
   },
   handler: setupHandler,

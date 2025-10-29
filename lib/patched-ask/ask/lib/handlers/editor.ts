@@ -1,7 +1,7 @@
-import iro, { blue, gray } from "@sallai/iro";
-import { Prompt, type PromptOpts } from "../core/base.ts";
-import type { Result } from "../core/result.ts";
-import { getPreferredEditor, unIro } from "../core/utils.ts";
+import iro, { blue, gray } from "@sallai/iro"
+import { Prompt, type PromptOpts } from "../core/base.ts"
+import type { Result } from "../core/result.ts"
+import { getPreferredEditor, unIro } from "../core/utils.ts"
 
 /**
  * Options for the editor prompt.
@@ -11,7 +11,7 @@ export type EditorOpts = PromptOpts<string> & {
    * The type of the prompt. This can not be changed but will be used to
    * determine the type of the question.
    */
-  type?: "editor";
+  type?: "editor"
 
   /**
    * A path override or executable name for the editor to use. If not provided,
@@ -19,14 +19,14 @@ export type EditorOpts = PromptOpts<string> & {
    * aren't present either, a series of common editors will be searched for in
    * the system `PATH`.
    */
-  editorPath?: string;
+  editorPath?: string
 
   /**
    * A custom message to tell the user to press enter to launch their preferred
    * editor. If not provided, a default message will be used.
    */
-  editorPromptMessage?: string;
-};
+  editorPromptMessage?: string
+}
 
 /**
  * A prompt that will open a temporary file in the user's preferred editor and
@@ -35,71 +35,71 @@ export type EditorOpts = PromptOpts<string> & {
 export class EditorPrompt<T extends EditorOpts> extends Prompt<
   string | undefined
 > {
-  private editorPathOverride?: string;
-  private editorPromptMessage?: string;
+  private editorPathOverride?: string
+  private editorPromptMessage?: string
 
   constructor(opts: T) {
-    super(opts);
-    this.type = "editor";
+    super(opts)
+    this.type = "editor"
 
-    this.editorPathOverride = opts.editorPath;
-    this.editorPromptMessage = opts.editorPromptMessage;
+    this.editorPathOverride = opts.editorPath
+    this.editorPromptMessage = opts.editorPromptMessage
   }
 
   private getEditorPrompt(): string {
     if (this.editorPromptMessage) {
-      return this.editorPromptMessage;
+      return this.editorPromptMessage
     }
 
     return iro(
       `Press ${iro("<enter>", blue)} to launch your preferred editor.`,
-      gray
-    );
+      gray,
+    )
   }
 
   private async launch(): Promise<string | undefined> {
     if (this.input === Deno.stdin) {
-      (this.input as typeof Deno.stdin).setRaw(true);
+      ;(this.input as typeof Deno.stdin).setRaw(true)
     }
 
     while (true) {
-      const buffer = new Uint8Array(1);
-      await this.input.read(buffer);
+      const buffer = new Uint8Array(1)
+      await this.input.read(buffer)
 
       if (buffer[0] === 3) {
-        throw new Error("Editor prompt was canceled.");
+        throw new Error("Editor prompt was canceled.")
       }
 
       if (buffer[0] === 13) {
-        break;
+        break
       }
     }
 
     if (this.input === Deno.stdin) {
-      (this.input as typeof Deno.stdin).setRaw(false);
+      ;(this.input as typeof Deno.stdin).setRaw(false)
     }
 
-    const editorPath = this.editorPathOverride ?? (await getPreferredEditor());
+    const editorPath = this.editorPathOverride ?? (await getPreferredEditor())
 
     if (!editorPath) {
       throw new Error(
-        "No preferred editor found. Set the VISUAL or EDITOR environment variable."
-      );
+        "No preferred editor found. Set the VISUAL or EDITOR environment variable.",
+      )
     }
 
-    const tempFile = await Deno.makeTempFile({ prefix: "ask_" });
+    const tempFile = await Deno.makeTempFile({ prefix: "ask_" })
 
     const process = new Deno.Command(editorPath, {
       args: [tempFile],
-    });
+    })
 
-    const child = process.spawn();
-    await child.output();
+    const child = process.spawn()
+    await child.output()
 
-    const data = await Deno.readTextFile(tempFile);
-    await Deno.remove(tempFile);
+    const data = await Deno.readTextFile(tempFile)
+    await Deno.remove(tempFile)
 
-    return data;
+    return data
   }
 
   /**
@@ -107,26 +107,26 @@ export class EditorPrompt<T extends EditorOpts> extends Prompt<
    * contents of the file when the editor is closed.
    */
   async run(): Promise<Result<T, string | undefined>> {
-    const prompt = new TextEncoder().encode(this.getPrompt());
-    await this.output.write(prompt);
+    const prompt = new TextEncoder().encode(this.getPrompt())
+    await this.output.write(prompt)
 
-    const editorPromptStr = this.getEditorPrompt();
-    const editorPrompt = new TextEncoder().encode(editorPromptStr);
-    const editorPromptLen = unIro(editorPromptStr).length;
-    await this.output.write(editorPrompt);
+    const editorPromptStr = this.getEditorPrompt()
+    const editorPrompt = new TextEncoder().encode(editorPromptStr)
+    const editorPromptLen = unIro(editorPromptStr).length
+    await this.output.write(editorPrompt)
 
-    const data = await this.launch();
+    const data = await this.launch()
 
-    await this.output.write(prompt);
+    await this.output.write(prompt)
     await this.output.write(
-      new TextEncoder().encode(" ".repeat(editorPromptLen))
-    );
-    await this.output.write(new TextEncoder().encode("\n"));
+      new TextEncoder().encode(" ".repeat(editorPromptLen)),
+    )
+    await this.output.write(new TextEncoder().encode("\n"))
 
     const result = {
       [this.name]: data,
-    } as Result<T, string | undefined>;
+    } as Result<T, string | undefined>
 
-    return result;
+    return result
   }
 }
