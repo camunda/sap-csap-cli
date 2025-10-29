@@ -8,7 +8,7 @@ import { setupHandler } from "./setup-handler.ts"
 
 export const setupCommand = {
   command:
-    `setup [for] [camunda] [deployment] [clusterId] [region] [clientId] [clientSecret] [btpRoute] [to]`,
+    `setup [for] [camunda] [deployment] [clusterId] [region] [clientId] [clientSecret] [btpRoute] [btpPluginBranch] [to]`,
   describe: "prepare one of Camunda's SAP Integration modules for deployment",
   builder: (yargs: YargsInstance) => {
     return yargs
