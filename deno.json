@@ -6,11 +6,10 @@
   },
   "imports": {
     "@octokit/rest": "npm:@octokit/rest@^21.1.1",
-    "@sallai/ask": "jsr:@sallai/ask@^2.0.2",
-    "@std/cli": "jsr:@std/cli@^1.0.15"
+    "@sallai/ask": "./lib/patched-ask/ask/mod.ts",
+    "@sallai/iro": "jsr:@sallai/iro@^1.0.4",
+    "@std/cli": "jsr:@std/cli@^1.0.15",
+    "@std/io": "jsr:@std/io@^0.225.2"
   },
-  "patch": [
-    "./lib/patched-ask/ask/"
-  ],
-  "version": "1.2.0"
+  "version": "1.2.1"
 }

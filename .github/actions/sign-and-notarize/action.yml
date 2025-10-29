@@ -58,4 +58,3 @@ runs:
         INPUT_APPLE_ID: ${{ inputs.apple-id }}
         INPUT_APP_PASSWORD: ${{ inputs.app-password }}
         INPUT_TEAM_ID: ${{ inputs.team-id }}
-

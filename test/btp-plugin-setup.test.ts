@@ -1,7 +1,7 @@
 import { assert, assertEquals, assertStringIncludes } from "jsr:@std/assert"
 import { join } from "jsr:@std/path"
 
-const VERSIONS = ["8.7", "8.6", "8.5"]
+const VERSIONS = ["8.8", "8.7", "8.6"]
 const ROUTE = "my-route.example.org"
 const CLUSTER_ID = "my-cluster-id"
 const REGION = "region-1"

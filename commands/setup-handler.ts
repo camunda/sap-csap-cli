@@ -9,7 +9,7 @@ import {
 import {
   detectCredentials,
   getCredentials,
-  getCredentialsFromEnv
+  getCredentialsFromEnv,
 } from "../lib/credentials.ts"
 import { createBuildDir } from "./modules/createBuildDir.ts"
 import { btpPlugin } from "./modules/btp_plugin.ts"

@@ -1,5 +1,5 @@
 import { join } from "jsr:@std/path"
-import * as url from 'node:url'
+import * as url from "node:url"
 import { clone, isRepoModified } from "../../lib/common.ts"
 import { CamundaCredentials } from "../../lib/credentials.ts"
 
@@ -26,7 +26,8 @@ export async function btpPlugin(
   )
 
   if (!directoryExists) {
-    const isWindows = (Deno.env.get("OS")?.toLowerCase().includes("windows") ?? false)
+    const isWindows = Deno.env.get("OS")?.toLowerCase().includes("windows") ??
+      false
     if (!isWindows) {
       await Deno.mkdir(to, { recursive: true })
     }
