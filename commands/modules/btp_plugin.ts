@@ -68,7 +68,11 @@ async function purge(dir: string) {
 
 async function _clone(to: string, btpPluginBranch: string) {
   console.log(`i cloning SAP BTP Plugin repository...`)
-  await clone("https://github.com/camunda/sap-btp-plugin", btpPluginBranch, to)
+  if (!await clone("https://github.com/camunda/sap-btp-plugin", btpPluginBranch, to)) {
+    // console.log("%c//> BTP Plugin setup", "color:orange")
+    console.error(`%c! failed to clone SAP BTP Plugin repository from branch ${btpPluginBranch}`, "color: red; font-weight: bold;")
+    Deno.exit(1)
+  }
   console.log(`✓ cloned SAP BTP Plugin to ${to} from ${btpPluginBranch} branch`)
 }
 
