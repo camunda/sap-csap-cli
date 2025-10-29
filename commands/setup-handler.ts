@@ -40,19 +40,30 @@ export async function setupHandler(argv: any) {
     })).deployment
   const btpRoute = ["btp-plugin", "all"].includes(sapIntegrationModule)
     ? argv.btpRoute ||
-      (await ask.input({
-        name: "btpRoute",
-        message:
-          "BTP route to reach the plugin\n (without http(s):// and trailing /)",
-        validate: (input?: string) => {
-          if (input?.endsWith("/") || input?.startsWith("http")) {
-            return false
-          } else {
-            return true
-          }
-        },
-        default: "camunda-btp-plugin.cfapps.eu10-004.hana.ondemand.com",
-      })).btpRoute
+    (await ask.input({
+      name: "btpRoute",
+      message:
+        "BTP route to reach the plugin\n (without http(s):// and trailing /)",
+      validate: (input?: string) => {
+        if (input?.endsWith("/") || input?.startsWith("http")) {
+          return false
+        } else {
+          return true
+        }
+      },
+      default: "camunda-btp-plugin.cfapps.eu10-004.hana.ondemand.com",
+    })).btpRoute
+    : "n/a"
+
+    
+  const btpPluginBranch = ["btp-plugin", "all"].includes(sapIntegrationModule)
+    ? argv.btpPluginBranch ||
+    (await ask.input({
+      name: "btpPluginBranch",
+      message:
+        "branch to clone the btp plugin from (defaults to 'main')",
+      default: "main",
+    })).btpPluginBranch
     : "n/a"
 
   const to = argv.to ||
@@ -111,6 +122,7 @@ export async function setupHandler(argv: any) {
       await rfcConnector(options)
       await btpPlugin({
         btpRoute,
+        btpPluginBranch,
         ...options,
       })
       break
@@ -122,6 +134,7 @@ export async function setupHandler(argv: any) {
         credentials,
         btpRoute,
         to,
+        btpPluginBranch,
       })
       break
     case "odata":
