@@ -35,6 +35,10 @@ export const setupCommand = {
         description:
           "(only for 'btp-plugin' or 'all') BTP route to reach the plugin",
       })
+      .option("btpPluginBranch", {
+        type: "string",
+        description: "(only for 'btp-plugin' or 'all') git branch (defaults to main/master)"
+      })
       .option("clusterId", {
         type: "string",
         description: "Camunda Cluster ID",

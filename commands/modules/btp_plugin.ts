@@ -4,12 +4,13 @@ import { clone, isRepoModified } from "../../lib/common.ts"
 import { CamundaCredentials } from "../../lib/credentials.ts"
 
 export async function btpPlugin(
-  { camundaVersion, camundaDeployment, credentials, btpRoute, to }: {
+  { camundaVersion, camundaDeployment, credentials, btpRoute, to, btpPluginBranch }: {
     camundaVersion: `${number}.${number}`
     camundaDeployment: string
     credentials: CamundaCredentials
     btpRoute: string
     to: string
+    btpPluginBranch: string
   },
 ) {
   console.log("")
@@ -30,7 +31,7 @@ export async function btpPlugin(
     if (!isWindows) {
       await Deno.mkdir(to, { recursive: true })
     }
-    await _clone(to)
+    await _clone(to, btpPluginBranch)
   } else {
     console.log(`i target directory ${to} already exists`)
     console.log(`i checking repository integrity...`)
@@ -38,7 +39,7 @@ export async function btpPlugin(
     const resetRepo = async (reason: string) => {
       console.log(`! ${reason} - purging...`)
       await purge(to)
-      await _clone(to)
+      await _clone(to, btpPluginBranch)
     }
 
     if (await isRepoModified(to)) {
@@ -65,10 +66,10 @@ async function purge(dir: string) {
   await Deno.mkdir(dir, { recursive: true })
 }
 
-async function _clone(to: string) {
+async function _clone(to: string, btpPluginBranch: string) {
   console.log(`i cloning SAP BTP Plugin repository...`)
-  await clone("https://github.com/camunda/sap-btp-plugin", "main", to)
-  console.log(`✓ cloned SAP BTP Plugin to ${to}`)
+  await clone("https://github.com/camunda/sap-btp-plugin", btpPluginBranch, to)
+  console.log(`✓ cloned SAP BTP Plugin to ${to} from ${btpPluginBranch} branch`)
 }
 
 async function previousBuildExists(dir: string) {
