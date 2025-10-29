@@ -61,7 +61,7 @@ export async function setupHandler(argv: any) {
     (await ask.input({
       name: "btpPluginBranch",
       message:
-        "branch to clone the btp plugin from (defaults to main/master)",
+        "branch to clone the btp plugin from (defaults to 'main')",
       default: "main",
     })).btpPluginBranch
     : "n/a"

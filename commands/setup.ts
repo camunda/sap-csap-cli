@@ -37,7 +37,7 @@ export const setupCommand = {
       })
       .option("btpPluginBranch", {
         type: "string",
-        description: "(only for 'btp-plugin' or 'all') git branch (defaults to main/master)"
+        description: "(only for 'btp-plugin' or 'all') git branch (defaults to 'main')"
       })
       .option("clusterId", {
         type: "string",
