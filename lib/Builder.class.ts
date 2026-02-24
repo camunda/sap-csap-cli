@@ -49,28 +49,18 @@ export class Builder {
       return this.buildRFC()
     }
   }
-  private buildRFC() {
-    // we have to:
-    // - parse the mtad.yaml.example file and save it as mtad.yaml
+
+  private processMtadTemplate(
+    replacements: Array<[string | RegExp, string]>
+  ): void {
     const rawMtad = Deno.readTextFileSync(
       path.join(this.assetLocation, "mtad.yaml.example"),
     )
-    const mangledMtad = rawMtad
-      .replaceAll("<app-version>", this.for.semver)
-      // to prevent
-      // Error parsing xs-security.json data: Inconsistent xs-security.json: Invalid xsappname "...": May only include characters 'a'-'z', 'A'-'Z', '0'-'9', '_', '-', '\', and '/'.)
-      // at deploy-time
-      .replaceAll("<mangled-version>", this.for.semver.replaceAll(".", "_"))
-      .replaceAll("<your-cluster-id>", this.credentials.clusterId)
-      .replaceAll(
-        "<client-id-credential-from-api-client>",
-        this.credentials.clientId,
-      )
-      .replaceAll(
-        "<client-secret-credential-from-api-client>",
-        this.credentials.clientSecret,
-      )
-      .replaceAll("<your-cluster-region>", this.credentials.region)
+
+    let mangledMtad = rawMtad
+    for (const [pattern, replacement] of replacements) {
+      mangledMtad = mangledMtad.replaceAll(pattern, replacement)
+    }
 
     const rawYaml = parse(mangledMtad)
     const mtad = stringify(rawYaml, { indent: 2 })
@@ -82,170 +72,45 @@ export class Builder {
       path.join(this.assetLocation, "mtad.yaml.example"),
     )
   }
+
+  private buildRFC() {
+    const replacements: Array<[string | RegExp, string]> = [
+      ["<app-version>", this.for.semver],
+      // to prevent
+      // Error parsing xs-security.json data: Inconsistent xs-security.json: Invalid xsappname "...": May only include characters 'a'-'z', 'A'-'Z', '0'-'9', '_', '-', '\\', and '/'.)
+      // at deploy-time
+      ["<mangled-version>", this.for.semver.replaceAll(".", "_")],
+      ["<your-cluster-id>", this.credentials.clusterId],
+      ["<client-id-credential-from-api-client>", this.credentials.clientId],
+      [
+        "<client-secret-credential-from-api-client>",
+        this.credentials.clientSecret,
+      ],
+      ["<your-cluster-region>", this.credentials.region],
+    ]
+
+    this.processMtadTemplate(replacements)
+  }
   private buildOData() {
-    // we have to:
-    // - parse the mtad.yaml.example file and save it as mtad.yaml
-    const rawMtad = Deno.readTextFileSync(
-      path.join(this.assetLocation, "mtad.yaml.example"),
-    )
-    const mangledMtad = rawMtad
-      .replaceAll("<app-version>", this.for.semver)
-      .replaceAll(
+    const replacements: Array<[string | RegExp, string]> = [
+      ["<app-version>", this.for.semver],
+      [
         "name: sap-odata-connector",
         `name: sap-odata-connector-${this.for.semver}`,
-      )
-      .replaceAll("<your-cluster-id>", this.credentials.clusterId)
-      .replaceAll(
-        "<client-id-credential-from-api-client>",
-        this.credentials.clientId,
-      )
-      .replaceAll(
-        "<client-secret-credential-from-api-client>",
-        this.credentials.clientSecret,
-      )
-      .replaceAll("<your-cluster-region>", this.credentials.region)
-      .replaceAll(
+      ],
+      [
         /camunda\/sap-odata-connector:<pick.*>/g,
         `camunda/sap-odata-connector:${this.for.semver}`,
-      )
-      .replaceAll("<your-cluster-id>", this.credentials.clusterId)
-      .replaceAll(
-        "<client-id-credential-from-api-client>",
-        this.credentials.clientId,
-      )
-      .replaceAll(
+      ],
+      ["<your-cluster-id>", this.credentials.clusterId],
+      ["<client-id-credential-from-api-client>", this.credentials.clientId],
+      [
         "<client-secret-credential-from-api-client>",
         this.credentials.clientSecret,
-      )
-      .replaceAll("<your-cluster-region>", this.credentials.region)
-      .replaceAll("<your-cluster-id>", this.credentials.clusterId)
-      .replaceAll(
-        "<client-id-credential-from-api-client>",
-        this.credentials.clientId,
-      )
-      .replaceAll(
-        "<client-secret-credential-from-api-client>",
-        this.credentials.clientSecret,
-      )
-      .replaceAll("<your-cluster-region>", this.credentials.region)
-      .replaceAll("<your-cluster-id>", this.credentials.clusterId)
-      .replaceAll(
-        "<client-id-credential-from-api-client>",
-        this.credentials.clientId,
-      )
-      .replaceAll(
-        "<client-secret-credential-from-api-client>",
-        this.credentials.clientSecret,
-      )
-      .replaceAll("<your-cluster-region>", this.credentials.region)
-      .replaceAll("<your-cluster-id>", this.credentials.clusterId)
-      .replaceAll(
-        "<client-id-credential-from-api-client>",
-        this.credentials.clientId,
-      )
-      .replaceAll(
-        "<client-secret-credential-from-api-client>",
-        this.credentials.clientSecret,
-      )
-      .replaceAll("<your-cluster-region>", this.credentials.region)
-      .replaceAll("<your-cluster-id>", this.credentials.clusterId)
-      .replaceAll(
-        "<client-id-credential-from-api-client>",
-        this.credentials.clientId,
-      )
-      .replaceAll(
-        "<client-secret-credential-from-api-client>",
-        this.credentials.clientSecret,
-      )
-      .replaceAll("<your-cluster-region>", this.credentials.region)
-      .replaceAll("<your-cluster-id>", this.credentials.clusterId)
-      .replaceAll(
-        "<client-id-credential-from-api-client>",
-        this.credentials.clientId,
-      )
-      .replaceAll(
-        "<client-secret-credential-from-api-client>",
-        this.credentials.clientSecret,
-      )
-      .replaceAll("<your-cluster-region>", this.credentials.region)
-      .replaceAll("<your-cluster-id>", this.credentials.clusterId)
-      .replaceAll(
-        "<client-id-credential-from-api-client>",
-        this.credentials.clientId,
-      )
-      .replaceAll(
-        "<client-secret-credential-from-api-client>",
-        this.credentials.clientSecret,
-      )
-      .replaceAll("<your-cluster-region>", this.credentials.region)
-      .replaceAll("<your-cluster-id>", this.credentials.clusterId)
-      .replaceAll(
-        "<client-id-credential-from-api-client>",
-        this.credentials.clientId,
-      )
-      .replaceAll(
-        "<client-secret-credential-from-api-client>",
-        this.credentials.clientSecret,
-      )
-      .replaceAll("<your-cluster-region>", this.credentials.region)
-      .replaceAll("<your-cluster-id>", this.credentials.clusterId)
-      .replaceAll(
-        "<client-id-credential-from-api-client>",
-        this.credentials.clientId,
-      )
-      .replaceAll(
-        "<client-secret-credential-from-api-client>",
-        this.credentials.clientSecret,
-      )
-      .replaceAll("<your-cluster-region>", this.credentials.region)
-      .replaceAll("<your-cluster-id>", this.credentials.clusterId)
-      .replaceAll(
-        "<client-id-credential-from-api-client>",
-        this.credentials.clientId,
-      )
-      .replaceAll(
-        "<client-secret-credential-from-api-client>",
-        this.credentials.clientSecret,
-      )
-      .replaceAll("<your-cluster-region>", this.credentials.region)
-      .replaceAll("<your-cluster-id>", this.credentials.clusterId)
-      .replaceAll(
-        "<client-id-credential-from-api-client>",
-        this.credentials.clientId,
-      )
-      .replaceAll(
-        "<client-secret-credential-from-api-client>",
-        this.credentials.clientSecret,
-      )
-      .replaceAll("<your-cluster-region>", this.credentials.region)
-      .replaceAll("<your-cluster-id>", this.credentials.clusterId)
-      .replaceAll(
-        "<client-id-credential-from-api-client>",
-        this.credentials.clientId,
-      )
-      .replaceAll(
-        "<client-secret-credential-from-api-client>",
-        this.credentials.clientSecret,
-      )
-      .replaceAll("<your-cluster-region>", this.credentials.region)
-      .replaceAll("<your-cluster-id>", this.credentials.clusterId)
-      .replaceAll(
-        "<client-id-credential-from-api-client>",
-        this.credentials.clientId,
-      )
-      .replaceAll(
-        "<client-secret-credential-from-api-client>",
-        this.credentials.clientSecret,
-      )
-      .replaceAll("<your-cluster-region>", this.credentials.region)
-    const rawYaml = parse(mangledMtad)
-    const mtad = stringify(rawYaml, { indent: 2 })
-    Deno.writeTextFileSync(
-      path.join(this.assetLocation, "mtad.yaml"),
-      mtad,
-    )
-    Deno.removeSync(
-      path.join(this.assetLocation, "mtad.yaml.example"),
-    )
+      ],
+      ["<your-cluster-region>", this.credentials.region],
+    ]
+
+    this.processMtadTemplate(replacements)
   }
 }
