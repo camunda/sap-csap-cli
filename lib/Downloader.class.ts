@@ -18,25 +18,29 @@ export class Downloader {
     | null = null
 
   for: {
-    module: (typeof Kind)[keyof typeof Kind] //> e.g. "sap-odata-connector"
+    module: (typeof Kind)[keyof typeof Kind] //> e.g. "sap-connectors"
+    submodule: string, // optional submodule for release tags, if multiple elements exist in one module (e.g. sap-connectors-odata, sap-connectors-rfc within sap-connectors)
     version: `${number}.${number}` //> c8 release, e.g. 8.7
   }
   dir: string | "" = ""
 
   constructor(
-    module: (typeof Kind)[keyof typeof Kind], //> e.g. "sap-odata-connector"
+    module: (typeof Kind)[keyof typeof Kind], //> e.g. "sap-connectors"
     version: `${number}.${number}`, //> c8 release, e.g. 8.7
     to: string, //> target directory
+    submodule: string = "" // optional submodule for release tags, if multiple elements exist in one module (e.g. sap-connectors-odata, sap-connectors-rfc within sap-connectors)
   ) {
     this.to = to
-    if (version === "8.8" && (module === Kind.odata || module === Kind.rfc)) {
+    // TODO: add more generic check for unsupported versions in case we have more modules that do not support 8.9 and we dont want to maintain a hardcoded list of unsupported modules
+    if (version === "8.9" && (module === Kind.odata || module === Kind.rfc)) {
       const msg =
-        "! RFC- and OData-connector are currently only available for Camunda <= 8.7...\n! 8.8 support coming soon!"
+        "! RFC- and OData-connector are currently only available for Camunda <= 8.8...\n! 8.9 support coming soon!"
       console.log(`%c${msg}`, "color:red")
       Deno.exit(1)
     }
     this.for = {
       module,
+      submodule,
       version,
     }
   }
@@ -53,9 +57,11 @@ export class Downloader {
         },
       },
     )
+    console.log(`endpoint is ${releases.url}`)
     this.releases = releases.data
     Deno.stdout.write(
-      new TextEncoder().encode(`✓ fetched releases: ${this.releases.length}\n`),
+      new TextEncoder().encode(`✓ fetched releases: ${this.releases.length}
+        ${releases.data.map((r) => `  - ${r.name}`).join("\n")}\n`),
     )
     return this.releases
   }
@@ -68,8 +74,11 @@ export class Downloader {
       new TextEncoder().encode("i determining latest release...\n"),
     )
     const _releases = this.releases.filter((release) => {
-      const semver = release.name ? release.name : "0.0.0"
-      const [major, minor] = semver.split(".").map(Number)
+      const [release_name, release_semver] = release.tag_name.split("-")
+      const [major, minor] = release_semver.split(".").map(Number)
+      if (release_name !== this.for.submodule) {
+        return false
+      }
       const [targetMajor, targetMinor] = this.for.version.split(".").map(Number)
 
       return major === targetMajor && minor === targetMinor
@@ -140,8 +149,7 @@ export class Downloader {
       if (fileInfo.size === asset.size) {
         Deno.stdout.write(
           new TextEncoder().encode(
-            `i File already exists: ${
-              basename(filePath)
+            `i File already exists: ${basename(filePath)
             } - skipping download\n`,
           ),
         )

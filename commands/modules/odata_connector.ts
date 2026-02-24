@@ -14,7 +14,7 @@ export async function odataConnector(
   console.log("")
   console.log("%c//> OData connector setup", "color:orange")
 
-  const odataConnector = new Downloader(Kind.odata, camundaVersion, to)
+  const odataConnector = new Downloader(Kind.odata, camundaVersion, to, "odata")
   await odataConnector.pullAssets()
   const downloadDir = odataConnector.dir
   const latestRelease = await odataConnector.getLatestRelease()

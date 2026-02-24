@@ -22,6 +22,7 @@ export function step(message: string) {
 }
 
 export const camundaVersions = [
+  { message: "8.9", value: "8.9" },
   { message: "8.8", value: "8.8" },
   { message: "8.7", value: "8.7" },
   { message: "8.6", value: "8.6" },
@@ -59,8 +60,8 @@ export type integrationModule = typeof sapIntegrationModules[number]
 
 // mainly for Downloader and Builder
 export const Kind = {
-  odata: "sap-odata-connector",
-  rfc: "sap-rfc-connector",
+  odata: "sap-connectors",
+  rfc: "sap-connectors",
   btp: "sap-btp-plugin",
 } as const
 

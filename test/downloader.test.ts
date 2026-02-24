@@ -20,7 +20,7 @@ Deno.test("should return a list of releases", async () => {
 })
 
 Deno.test("should return the latest release", async () => {
-  const downloader = new Downloader(Kind.rfc, "8.6", Deno.makeTempDirSync())
+  const downloader = new Downloader(Kind.rfc, "8.6", Deno.makeTempDirSync(), "rfc")
   const latestRelease = await downloader.getLatestRelease()
   await new Promise((resolve) => setTimeout(resolve, 100)) //> ...
   assertInstanceOf(latestRelease, Object)
@@ -35,7 +35,7 @@ Deno.test("should return the latest release", async () => {
 })
 
 Deno.test("should download assets for a module", async () => {
-  const downloader = new Downloader(Kind.odata, "8.6", Deno.makeTempDirSync())
+  const downloader = new Downloader(Kind.odata, "8.6", Deno.makeTempDirSync(), "odata")
   await downloader.pullAssets()
   const result = []
   for await (const dirEntry of walk(downloader.to)) {

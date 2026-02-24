@@ -3,12 +3,12 @@ import { Builder } from "../lib/Builder.class.ts"
 import { join } from "jsr:@std/path"
 import { Kind } from "../lib/common.ts"
 
-Deno.test("should correctly build for sap-odata-connector 8.6.1", async () => {
+Deno.test("should correctly build for odata sap-connectors 8.6.5", async () => {
   const assetLocation = join(
     Deno.cwd(),
     "test",
     "__assets__",
-    Kind.odata,
+    "sap-odata-connector",
     "8.6.1",
   )
   const credentials = {
@@ -18,7 +18,7 @@ Deno.test("should correctly build for sap-odata-connector 8.6.1", async () => {
     region: "bru-2",
   }
 
-  const builder = new Builder(Kind.odata, "8.6.1", assetLocation, credentials)
+  const builder = new Builder(Kind.odata, "8.6.1", assetLocation, credentials, "odata")
   await builder.build()
 
   const expectedContent = await Deno.readTextFile(
@@ -37,7 +37,7 @@ Deno.test("should correctly build for sap-rfc-connector 8.6.2", async () => {
     Deno.cwd(),
     "test",
     "__assets__",
-    Kind.rfc,
+    "sap-rfc-connector",
     "8.6.2",
   )
   const credentials = {
@@ -47,7 +47,7 @@ Deno.test("should correctly build for sap-rfc-connector 8.6.2", async () => {
     region: "bru-2",
   }
 
-  const builder = new Builder(Kind.rfc, "8.6.2", assetLocation, credentials)
+  const builder = new Builder(Kind.rfc, "8.6.2", assetLocation, credentials, "rfc")
   await builder.build()
 
   const expectedContent = await Deno.readTextFile(

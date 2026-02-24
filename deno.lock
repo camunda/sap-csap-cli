@@ -2,6 +2,7 @@
   "version": "5",
   "specifiers": {
     "jsr:@sallai/iro@^1.0.4": "1.0.4",
+    "jsr:@std/assert@*": "1.0.19",
     "jsr:@std/bytes@^1.0.5": "1.0.6",
     "jsr:@std/cli@^1.0.23": "1.0.23",
     "jsr:@std/fs@*": "1.0.6",
@@ -11,11 +12,18 @@
     "jsr:@std/path@^1.0.8": "1.0.8",
     "jsr:@std/yaml@*": "1.0.5",
     "npm:@octokit/rest@22": "22.0.0_@octokit+core@7.0.5",
+    "npm:@octokit/types@*": "15.0.1",
     "npm:@types/node@*": "24.2.0"
   },
   "jsr": {
     "@sallai/iro@1.0.4": {
       "integrity": "e14f39c7b80e80994788a8542b2c4983554fd4bb6d2f2a09471327f9cf37ee36"
+    },
+    "@std/assert@1.0.19": {
+      "integrity": "eaada96ee120cb980bc47e040f82814d786fe8162ecc53c91d8df60b8755991e",
+      "dependencies": [
+        "jsr:@std/internal"
+      ]
     },
     "@std/bytes@1.0.6": {
       "integrity": "f6ac6adbd8ccd99314045f5703e23af0a68d7f7e58364b47d2c7f408aeb5820a"

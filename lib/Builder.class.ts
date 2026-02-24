@@ -4,20 +4,23 @@ import { Kind } from "./common.ts"
 import { CamundaCredentials } from "./credentials.ts"
 export class Builder {
   for: {
-    module: (typeof Kind)[keyof typeof Kind] //> e.g. "sap-odata-connector"
+    submodule: string // optional submodule for release tags, if multiple elements exist in one module (e.g. sap-connectors-odata, sap-connectors-rfc within sap-connectors)
+    module: (typeof Kind)[keyof typeof Kind] //> e.g. "sap-connectors"
     semver: `${number}.${number}.${number}` //> integration module version
   }
   assetLocation: string
   credentials: CamundaCredentials
 
   constructor(
-    module: (typeof Kind)[keyof typeof Kind], //> e.g. "sap-odata-connector"
+    module: (typeof Kind)[keyof typeof Kind], //> e.g. "sap-connectors"
     semver: `${number}.${number}.${number}`, //> integration module version
     assetLocation: string, //> where the assets have been downloaded to
     credentials: CamundaCredentials,
+    submodule: string = "" // optional submodule, if multiple elements exist in one module (e.g. odata, rfc within sap-connectors)
   ) {
     this.for = {
       module,
+      submodule,
       semver,
     }
     this.assetLocation = assetLocation
@@ -39,15 +42,12 @@ export class Builder {
     }
   }
   build() {
-    if (this.for.module === Kind.odata) {
+    if(this.for.module === Kind.odata && this.for.submodule === "odata") {
       return this.buildOData()
     }
-    if (this.for.module === Kind.rfc) {
+    if(this.for.module === Kind.rfc && this.for.submodule === "rfc") {
       return this.buildRFC()
     }
-    // if (this.for.module === Kind.btp) {
-    //   return this.buildBTP()
-    // }
   }
   private buildRFC() {
     // we have to:

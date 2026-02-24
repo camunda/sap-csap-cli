@@ -48,7 +48,7 @@ export async function btpPlugin(
     } else if (await previousBuildExists(to)) {
       await resetRepo("target directory contains previous build artifacts")
     } else {
-      console.log("✓ repository integrity validated - continuing")
+      console.log("✔ repository integrity validated - continuing")
     }
   }
 
