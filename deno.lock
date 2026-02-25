@@ -6,6 +6,7 @@
     "jsr:@std/assert@^1.0.17": "1.0.19",
     "jsr:@std/bytes@^1.0.5": "1.0.6",
     "jsr:@std/cli@^1.0.23": "1.0.23",
+    "jsr:@std/fmt@*": "1.0.9",
     "jsr:@std/fs@*": "1.0.6",
     "jsr:@std/internal@^1.0.12": "1.0.12",
     "jsr:@std/io@~0.225.2": "0.225.2",
@@ -35,6 +36,9 @@
       "dependencies": [
         "jsr:@std/internal"
       ]
+    },
+    "@std/fmt@1.0.9": {
+      "integrity": "2487343e8899fb2be5d0e3d35013e54477ada198854e52dd05ed0422eddcabe0"
     },
     "@std/fs@1.0.6": {
       "integrity": "42b56e1e41b75583a21d5a37f6a6a27de9f510bcd36c0c85791d685ca0b85fa2",

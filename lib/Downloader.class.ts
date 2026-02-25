@@ -1,4 +1,5 @@
 import { Octokit } from "https://esm.sh/octokit?dts"
+import { red } from "jsr:@std/fmt/colors"
 import { basename, join } from "jsr:@std/path"
 import { GetResponseTypeFromEndpointMethod } from "npm:@octokit/types"
 import { Kind } from "./common.ts"
@@ -92,7 +93,9 @@ export class Downloader {
         Currently available releases are:\n${this.releases
           .map((r) => `\t- ${r.name}`)
           .join("\n")}`
-      console.error(`%c${msg}`, "color:red")
+      Deno.stdout.write(
+        new TextEncoder().encode(red(msg) + "\n"),
+      )
       throw new Error(msg)
     }
     this.latestRelease = _releases.at(-1)
@@ -194,7 +197,7 @@ export class Downloader {
       try {
         await this.getLatestRelease()
       } catch (error) {
-        Deno.exit(1) 
+        Deno.exit(1)
         return
       }
     }

@@ -12,6 +12,24 @@ import { walk } from "jsr:@std/fs/walk"
 import { Downloader } from "../lib/Downloader.class.ts"
 import { Kind } from "../lib/common.ts"
 
+function captureStdout<T>(fn: () => T | Promise<T>): Promise<[T, string]> {
+  return new Promise(async (resolve) => {
+    const buffer: Uint8Array[] = []
+    const originalWrite = Deno.stdout.write.bind(Deno.stdout)
+
+    Deno.stdout.write = (data: Uint8Array) => {
+      buffer.push(data)
+      return Promise.resolve(data.length)
+    }
+
+    const result = await fn()
+    Deno.stdout.write = originalWrite
+
+    const output = buffer.map(b => new TextDecoder().decode(b)).join("")
+    resolve([result, output])
+  })
+}
+
 Deno.test("should return a list of releases", async () => {
   const releases = await new Downloader(
     Kind.odata,
@@ -50,11 +68,17 @@ Deno.test("should download assets for a module", async () => {
 
 Deno.test("should print error, if no release found for given version", async () => {
   const downloader = new Downloader(Kind.odata, "0.0", Deno.makeTempDirSync(), "odata")
-  const consoleSpy = spy(console, "error")
-  await assertRejects(
-    async () => await downloader.getLatestRelease(),
-    Error,
-    "The requested odata-connector for version 0.0 is not supported"
+
+  const [releases, output] = await captureStdout(async () => {
+    return await assertRejects(
+      async () => await downloader.getLatestRelease(),
+      Error,
+      "The requested odata-connector for version 0.0 is not supported"
+    )
+  })
+
+  assertStringIncludes(
+    output,
+    "The requested odata-connector for version 0.0 is not supported",
   )
-  consoleSpy.calls[0].args[0].includes("! The requested odata-connector for version 0.0 is not supported.")
 }) 
