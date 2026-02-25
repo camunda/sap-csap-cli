@@ -31,13 +31,7 @@ export class Downloader {
     submodule: string = "" // optional submodule for release tags, if multiple elements exist in one module (e.g. sap-connectors-odata, sap-connectors-rfc within sap-connectors)
   ) {
     this.to = to
-    // TODO: add more generic check for unsupported versions in case we have more modules that do not support 8.9 and we dont want to maintain a hardcoded list of unsupported modules
-    if (version === "8.9" && (module === Kind.odata || module === Kind.rfc)) {
-      const msg =
-        "! RFC- and OData-connector are currently only available for Camunda <= 8.8...\n! 8.9 support coming soon!"
-      console.log(`%c${msg}`, "color:red")
-      Deno.exit(1)
-    }
+
     this.for = {
       module,
       submodule,
@@ -60,8 +54,7 @@ export class Downloader {
     console.log(`endpoint is ${releases.url}`)
     this.releases = releases.data
     Deno.stdout.write(
-      new TextEncoder().encode(`✓ fetched releases: ${this.releases.length}
-        ${releases.data.map((r) => `  - ${r.name}`).join("\n")}\n`),
+      new TextEncoder().encode(`✓ fetched releases: ${this.releases.length}\n`),
     )
     return this.releases
   }
@@ -93,6 +86,15 @@ export class Downloader {
         sensitivity: "base",
       })
     })
+    if (_releases.length === 0) {
+      const msg =
+        `! The requested ${this.for.submodule ? this.for.submodule : this.for.module}-connector for version ${this.for.version} is not supported.
+        Currently available releases are:\n${this.releases
+          .map((r) => `\t- ${r.name}`)
+          .join("\n")}`
+      console.log(`%c${msg}`, "color:red")
+      Deno.exit(1)
+    }
     this.latestRelease = _releases.at(-1)
     Deno.stdout.write(
       new TextEncoder().encode(
