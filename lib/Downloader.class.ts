@@ -92,8 +92,8 @@ export class Downloader {
         Currently available releases are:\n${this.releases
           .map((r) => `\t- ${r.name}`)
           .join("\n")}`
-      console.log(`%c${msg}`, "color:red")
-      Deno.exit(1)
+      console.error(`%c${msg}`, "color:red")
+      throw new Error(msg)
     }
     this.latestRelease = _releases.at(-1)
     Deno.stdout.write(
@@ -191,7 +191,12 @@ export class Downloader {
 
   async pullAssets() {
     if (!this.latestRelease) {
-      await this.getLatestRelease()
+      try {
+        await this.getLatestRelease()
+      } catch (error) {
+        Deno.exit(1) 
+        return
+      }
     }
     // <tmpdir>/camunda/8.6/sap-odata-connector/8.6.1/**/*
     const dir = join(

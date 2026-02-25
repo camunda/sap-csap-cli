@@ -4,7 +4,10 @@ import {
   assertInstanceOf,
   assertMatch,
   assertNotEquals,
+  assertRejects,
+  assertStringIncludes,
 } from "jsr:@std/assert"
+import { spy } from "jsr:@std/testing/mock"
 import { walk } from "jsr:@std/fs/walk"
 import { Downloader } from "../lib/Downloader.class.ts"
 import { Kind } from "../lib/common.ts"
@@ -44,3 +47,14 @@ Deno.test("should download assets for a module", async () => {
   assertGreaterOrEqual(result.length, 1)
   assertArrayIncludes(result, [downloader.for.module, downloader.for.version])
 })
+
+Deno.test("should print error, if no release found for given version", async () => {
+  const downloader = new Downloader(Kind.odata, "0.0", Deno.makeTempDirSync(), "odata")
+  const consoleSpy = spy(console, "error")
+  await assertRejects(
+    async () => await downloader.getLatestRelease(),
+    Error,
+    "The requested odata-connector for version 0.0 is not supported"
+  )
+  consoleSpy.calls[0].args[0].includes("! The requested odata-connector for version 0.0 is not supported.")
+}) 
