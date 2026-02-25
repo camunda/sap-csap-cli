@@ -42,12 +42,36 @@ export class Builder {
     }
   }
   build() {
-    if(this.for.module === Kind.odata && this.for.submodule === "odata") {
-      return this.buildOData()
-    }
-    if(this.for.module === Kind.rfc && this.for.submodule === "rfc") {
-      return this.buildRFC()
-    }
+    const replacements: Array<[string | RegExp, string]> = [
+      // to prevent
+      // Error parsing xs-security.json data: Inconsistent xs-security.json: Invalid xsappname "...": May only include characters 'a'-'z', 'A'-'Z', '0'-'9', '_', '-', '\\', and '/'.)
+      // at deploy-time
+      ["<mangled-version>", this.for.semver.replaceAll(".", "_")],
+      [
+        "name: sap-odata-connector",
+        `name: sap-odata-connector-${this.for.semver}`,
+      ],
+      [
+        /camunda\/sap-odata-connector:<pick.*>/g,
+        `camunda/sap-odata-connector:${this.for.semver}`,
+      ],
+      ["<app-version>", this.for.semver],
+
+      ["<your-cluster-id>", this.credentials.clusterId], // before monorepo
+      ["<client-id-credential-from-api-client>", this.credentials.clientId], // before monorepo
+      ["<client-secret-credential-from-api-client>", this.credentials.clientSecret], // before monorepo
+      ["<your-cluster-region>", this.credentials.region], // before monorepo
+
+      ["<cluster-id>", this.credentials.clusterId], // after monorepo
+      ["<client-id>", this.credentials.clientId], // after monorepo
+      ["<client-secret>", this.credentials.clientSecret], // after monorepo
+      ["<region-id>", this.credentials.region], // after monorepo 
+
+      ["deployment-name", `camunda-${this.for.submodule}-connector`],
+      ["base-domain", "camunda.io"]
+    ]
+
+    this.processMtadTemplate(replacements)
   }
 
   private processMtadTemplate(
@@ -68,46 +92,5 @@ export class Builder {
       path.join(this.assetLocation, "mtad.yaml"),
       mtad,
     )
-  }
-
-  private buildRFC() {
-    const replacements: Array<[string | RegExp, string]> = [
-      ["<app-version>", this.for.semver],
-      // to prevent
-      // Error parsing xs-security.json data: Inconsistent xs-security.json: Invalid xsappname "...": May only include characters 'a'-'z', 'A'-'Z', '0'-'9', '_', '-', '\\', and '/'.)
-      // at deploy-time
-      ["<mangled-version>", this.for.semver.replaceAll(".", "_")],
-      ["<your-cluster-id>", this.credentials.clusterId],
-      ["<client-id-credential-from-api-client>", this.credentials.clientId],
-      [
-        "<client-secret-credential-from-api-client>",
-        this.credentials.clientSecret,
-      ],
-      ["<your-cluster-region>", this.credentials.region],
-    ]
-
-    this.processMtadTemplate(replacements)
-  }
-  private buildOData() {
-    const replacements: Array<[string | RegExp, string]> = [
-      ["<app-version>", this.for.semver],
-      [
-        "name: sap-odata-connector",
-        `name: sap-odata-connector-${this.for.semver}`,
-      ],
-      [
-        /camunda\/sap-odata-connector:<pick.*>/g,
-        `camunda/sap-odata-connector:${this.for.semver}`,
-      ],
-      ["<your-cluster-id>", this.credentials.clusterId],
-      ["<client-id-credential-from-api-client>", this.credentials.clientId],
-      [
-        "<client-secret-credential-from-api-client>",
-        this.credentials.clientSecret,
-      ],
-      ["<your-cluster-region>", this.credentials.region],
-    ]
-
-    this.processMtadTemplate(replacements)
   }
 }
