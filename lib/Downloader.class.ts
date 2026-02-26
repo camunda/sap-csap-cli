@@ -206,7 +206,7 @@ export class Downloader {
       this.to,
       this.for.version,
       this.for.module,
-      this.latestRelease.name,
+      this.latestRelease.tag_name,
     )
     this.dir = dir
 

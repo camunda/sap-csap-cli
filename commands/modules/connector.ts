@@ -13,7 +13,6 @@ export async function connector(
   },
 ) {
   console.log("")
-  console.log(`%c//> ${to} connector setup", "color:orange`)
 
   const connector = new Downloader(Kind.odata, camundaVersion, to, "odata")
   await connector.pullAssets()
