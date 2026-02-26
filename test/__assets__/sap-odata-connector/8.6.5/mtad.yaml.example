@@ -1,0 +1,40 @@
+### This is currently not used. We should start using it however
+_schema-version: 3.3.0
+ID: sap-odata-connector-<app-version>
+version: "<app-version>"
+modules:
+- name: sap-odata-connector
+  type: application
+  properties:
+    ZEEBE_CLIENT_CLOUD_REGION: <region-id>
+    ZEEBE_CLIENT_CLOUD_CLUSTERID: <cluster-id>
+    ZEEBE_CLIENT_CLOUD_CLIENTID: <client-id>
+    ZEEBE_CLIENT_CLOUD_CLIENTSECRET: <client-secret>
+    # CAMUNDA_CLIENT_ZEEBE_PREFERRESTOVERGRPC: true
+    CAMUNDA_CONNECTOR_POLLING_ENABLED: false
+    CAMUNDA_CONNECTOR_WEBHOOK_ENABLED: false
+    CAMUNDA_CONNECTOR_SECRETPROVIDER_CONSOLE_ENABLED: true
+    LOGGING_LEVEL_ROOT: WARN # any of TRACE, DEBUG, INFO, WARN, ERROR, OFF
+    LOGGING_LEVEL_IO_CAMUNDA_CONNECTOR_SAP: DEBUG # any of TRACE, DEBUG, INFO, WARN, ERROR, OFF
+  requires:
+    - name: dest-camunda-odata-connector
+    - name: conn-camunda-odata-connector
+  parameters:
+    disk-quota: 2G
+    docker:
+      image: camunda/sap-odata-connector:<app-version>
+    enable-ssh: true
+    health-check-type: process
+    instances: 1
+    memory: 1G
+resources:
+  - name: dest-camunda-odata-connector
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: destination
+      service-plan: lite
+  - name: conn-camunda-odata-connector
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: connectivity
+      service-plan: lite

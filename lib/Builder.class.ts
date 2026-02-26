@@ -67,8 +67,8 @@ export class Builder {
       ["<client-secret>", this.credentials.clientSecret], // after monorepo
       ["<region-id>", this.credentials.region], // after monorepo 
 
-      ["deployment-name", `camunda-${this.for.submodule}-connector`],
-      ["base-domain", "camunda.io"]
+      ["<deployment-name>", `camunda-${this.for.submodule}-connector`],
+      ["<base-domain>", "camunda.io"]
     ]
 
     this.processMtadTemplate(replacements)
