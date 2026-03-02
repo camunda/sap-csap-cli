@@ -15,7 +15,13 @@ export async function connector(
   console.log("")
 
   const connector = new Downloader(Kind.odata, camundaVersion, to, "odata")
-  await connector.pullAssets()
+  try {
+    await connector.pullAssets()
+  } catch (_error) {
+    console.error(`x failed to download assets for OData connector for Camunda ${camundaVersion} from GitHub. Please check if version ${camundaVersion} exists and if your GH_TOKEN is correct.`)
+    Deno.exit(1)
+    return
+  }
   const downloadDir = connector.dir
   const latestRelease = await connector.getLatestRelease()
 

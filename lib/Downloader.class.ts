@@ -52,7 +52,6 @@ export class Downloader {
         },
       },
     )
-    console.log(`endpoint is ${releases.url}`)
     this.releases = releases.data
     Deno.stdout.write(
       new TextEncoder().encode(`✓ fetched releases: ${this.releases.length}\n`),
@@ -194,12 +193,7 @@ export class Downloader {
 
   async pullAssets() {
     if (!this.latestRelease) {
-      try {
-        await this.getLatestRelease()
-      } catch (error) {
-        Deno.exit(1)
-        return
-      }
+      await this.getLatestRelease()
     }
     // <tmpdir>/camunda/8.6/sap-odata-connector/8.6.1/**/*
     const dir = join(
