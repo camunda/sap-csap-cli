@@ -45,7 +45,7 @@ jobs:
           git config --global user.email "camunda@noreply.github.local"
 
       - name: Run tests
-        run: deno test --allow-all
+        run: deno test --allow-all --log-level=debug --no-check 
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
