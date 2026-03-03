@@ -74,7 +74,7 @@ export class Downloader {
       }
       const release_name = tag.slice(0, lastDashIndex)
       const release_semver = tag.slice(lastDashIndex + 1)
-      const [major, minor] = release_semver.split(".").map((part) => Number(part))
+      const [major, minor] = release_semver.split(".").map((part: string) => Number(part))
       if (release_name !== this.for.submodule) {
         return false
       }
