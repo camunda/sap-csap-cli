@@ -7,23 +7,29 @@ import {
   assertRejects,
   assertStringIncludes,
 } from "jsr:@std/assert"
+import { stub } from "jsr:@std/testing/mock"
 import { walk } from "jsr:@std/fs/walk"
 import { Downloader } from "../lib/Downloader.class.ts"
 import { Kind } from "../lib/common.ts"
 
 async function captureStdout<T>(fn: () => T | Promise<T>): Promise<[T, string]> {
   const buffer: Uint8Array[] = []
-  const originalWrite = Deno.stdout.write.bind(Deno.stdout)
-  Deno.stdout.write = (data: Uint8Array) => {
-    buffer.push(data)
-    return Promise.resolve(data.length)
-  }
+  
+  const writeStub = stub(
+    Deno.stdout,
+    "write",
+    (data: Uint8Array) => {
+      buffer.push(data)
+      return Promise.resolve(data.length)
+    }
+  )
+  
   try {
     const result = await fn()
     const output = buffer.map((b) => new TextDecoder().decode(b)).join("")
     return [result, output]
   } finally {
-    Deno.stdout.write = originalWrite
+    writeStub.restore()
   }
 }
 
