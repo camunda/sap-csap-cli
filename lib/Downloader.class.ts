@@ -67,9 +67,18 @@ export class Downloader {
       new TextEncoder().encode("i determining latest release...\n"),
     )
     const _releases = this.releases.filter((release) => {
-      const [release_name, release_semver] = release.tag_name.split("-")
-      const [major, minor] = release_semver.split(".").map(Number)
+      const tag = release.tag_name
+      const lastDashIndex = tag.lastIndexOf("-")
+      if (lastDashIndex === -1) {
+        return false
+      }
+      const release_name = tag.slice(0, lastDashIndex)
+      const release_semver = tag.slice(lastDashIndex + 1)
+      const [major, minor] = release_semver.split(".").map((part) => Number(part))
       if (release_name !== this.for.submodule) {
+        return false
+      }
+      if (Number.isNaN(major) || Number.isNaN(minor)) {
         return false
       }
       const [targetMajor, targetMinor] = this.for.version.split(".").map(Number)
