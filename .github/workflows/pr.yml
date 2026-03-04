@@ -42,6 +42,13 @@ jobs:
           git config --global user.email "camunda@noreply.github.local"
 
       - name: Run tests
-        run: deno test --allow-all --log-level=debug --no-check 
+        if: runner.os != 'Windows'
+        run: deno test --allow-all --log-level=debug --no-check
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run tests (Windows)
+        if: runner.os == 'Windows'
+        run: deno test --allow-all --log-level=debug --no-check --ignore=test/btp-plugin-setup.test.ts
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
