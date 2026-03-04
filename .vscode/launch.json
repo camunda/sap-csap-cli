@@ -13,7 +13,6 @@
       ],
       "type": "node"
     },
-
     {
       "request": "launch",
       "name": "deno connector btp-plugin",
