@@ -13,8 +13,7 @@ import {
 } from "../lib/credentials.ts"
 import { createBuildDir } from "./modules/createBuildDir.ts"
 import { btpPlugin } from "./modules/btp_plugin.ts"
-import { odataConnector } from "./modules/odata_connector.ts"
-import { rfcConnector } from "./modules/rfc_connector.ts"
+import { connector } from "./modules/connector.ts"
 
 export async function setupHandler(argv: any) {
   const sapIntegrationModule = argv.for ||
@@ -55,7 +54,7 @@ export async function setupHandler(argv: any) {
     })).btpRoute
     : "n/a"
 
-    
+
   const btpPluginBranch = ["btp-plugin", "all"].includes(sapIntegrationModule)
     ? argv.btpPluginBranch ||
     (await ask.input({
@@ -78,9 +77,9 @@ export async function setupHandler(argv: any) {
     argv.clusterId && argv.region && argv.clientId &&
     argv.clientSecret
   ) {
-    ;({ clusterId, region, clientId, clientSecret } = argv)
+    ; ({ clusterId, region, clientId, clientSecret } = argv)
   } else if (detectCredentials() === true) {
-    ;({
+    ; ({
       CAMUNDA_CLUSTER_ID: clusterId,
       CAMUNDA_CLUSTER_REGION: region,
       CAMUNDA_CLIENT_ID: clientId,
@@ -99,9 +98,9 @@ export async function setupHandler(argv: any) {
     console.log(
       "\ni No Camunda API credentials found in environment. Enter credentials manually",
     )
-    ;({ clusterId, region, clientId, clientSecret } = await getCredentials(
-      argv,
-    ))
+      ; ({ clusterId, region, clientId, clientSecret } = await getCredentials(
+        argv,
+      ))
   }
   const credentials = {
     clusterId,
@@ -110,16 +109,17 @@ export async function setupHandler(argv: any) {
     clientSecret,
   }
 
+  const options = {
+    camundaVersion,
+    camundaDeployment,
+    credentials,
+    to,
+  }
+
   switch (sapIntegrationModule) {
     case "all": {
-      const options = {
-        camundaVersion,
-        camundaDeployment,
-        credentials,
-        to,
-      }
-      await odataConnector(options)
-      await rfcConnector(options)
+      await connector({ ...options, submodule: "odata" })
+      await connector({ ...options, submodule: "rfc" })
       await btpPlugin({
         btpRoute,
         btpPluginBranch,
@@ -138,20 +138,10 @@ export async function setupHandler(argv: any) {
       })
       break
     case "odata":
-      await odataConnector({
-        camundaVersion,
-        camundaDeployment,
-        credentials,
-        to,
-      })
+      await connector({ ...options, submodule: "odata" })
       break
     case "rfc":
-      await rfcConnector({
-        camundaVersion,
-        camundaDeployment,
-        credentials,
-        to,
-      })
+      await connector({ ...options, submodule: "rfc" })
       break
     default:
       console.error("invalid SAP integration module selected")

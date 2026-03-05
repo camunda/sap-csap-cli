@@ -1,4 +1,5 @@
 import { Octokit } from "https://esm.sh/octokit?dts"
+import { red } from "jsr:@std/fmt/colors"
 import { basename, join } from "jsr:@std/path"
 import { GetResponseTypeFromEndpointMethod } from "npm:@octokit/types"
 import { Kind } from "./common.ts"
@@ -6,6 +7,10 @@ import { Kind } from "./common.ts"
 const octokit = new Octokit({
   userAgent: "csap",
   auth: Deno.env.get("GH_TOKEN"),
+  request: {
+    timeout: 60000, // 30 Sekunden - verhindert lange HTTP/2 Connection Hangs
+    keepAliveTimeout: 30000 // Verbindung länger aktiv halten
+  },
 })
 
 export class Downloader {
@@ -18,25 +23,23 @@ export class Downloader {
     | null = null
 
   for: {
-    module: (typeof Kind)[keyof typeof Kind] //> e.g. "sap-odata-connector"
+    module: (typeof Kind)[keyof typeof Kind] //> e.g. "sap-connectors"
+    submodule: string, // optional submodule for release tags, if multiple elements exist in one module (e.g. sap-connectors-odata, sap-connectors-rfc within sap-connectors)
     version: `${number}.${number}` //> c8 release, e.g. 8.7
   }
   dir: string | "" = ""
 
   constructor(
-    module: (typeof Kind)[keyof typeof Kind], //> e.g. "sap-odata-connector"
+    module: (typeof Kind)[keyof typeof Kind], //> e.g. "sap-connectors"
     version: `${number}.${number}`, //> c8 release, e.g. 8.7
     to: string, //> target directory
+    submodule: string = "" // optional submodule for release tags, if multiple elements exist in one module (e.g. sap-connectors-odata, sap-connectors-rfc within sap-connectors)
   ) {
     this.to = to
-    if (version === "8.8" && (module === Kind.odata || module === Kind.rfc)) {
-      const msg =
-        "! RFC- and OData-connector are currently only available for Camunda <= 8.7...\n! 8.8 support coming soon!"
-      console.log(`%c${msg}`, "color:red")
-      Deno.exit(1)
-    }
+
     this.for = {
       module,
+      submodule,
       version,
     }
   }
@@ -68,8 +71,20 @@ export class Downloader {
       new TextEncoder().encode("i determining latest release...\n"),
     )
     const _releases = this.releases.filter((release) => {
-      const semver = release.name ? release.name : "0.0.0"
-      const [major, minor] = semver.split(".").map(Number)
+      const tag = release.tag_name
+      const lastDashIndex = tag.lastIndexOf("-")
+      if (lastDashIndex === -1) {
+        return false
+      }
+      const release_name = tag.slice(0, lastDashIndex)
+      const release_semver = tag.slice(lastDashIndex + 1)
+      const [major, minor] = release_semver.split(".").map((part: string) => Number(part))
+      if (release_name !== this.for.submodule) {
+        return false
+      }
+      if (Number.isNaN(major) || Number.isNaN(minor)) {
+        return false
+      }
       const [targetMajor, targetMinor] = this.for.version.split(".").map(Number)
 
       return major === targetMajor && minor === targetMinor
@@ -84,6 +99,17 @@ export class Downloader {
         sensitivity: "base",
       })
     })
+    if (_releases.length === 0) {
+      const msg =
+        `! The requested ${this.for.submodule ? this.for.submodule : this.for.module}-connector for version ${this.for.version} is not supported.
+        Currently available releases are:\n${this.releases
+          .map((r) => `\t- ${r.name}`)
+          .join("\n")}`
+      Deno.stdout.write(
+        new TextEncoder().encode(red(msg) + "\n"),
+      )
+      throw new Error(msg)
+    }
     this.latestRelease = _releases.at(-1)
     Deno.stdout.write(
       new TextEncoder().encode(
@@ -140,8 +166,7 @@ export class Downloader {
       if (fileInfo.size === asset.size) {
         Deno.stdout.write(
           new TextEncoder().encode(
-            `i File already exists: ${
-              basename(filePath)
+            `i File already exists: ${basename(filePath)
             } - skipping download\n`,
           ),
         )
@@ -188,7 +213,7 @@ export class Downloader {
       this.to,
       this.for.version,
       this.for.module,
-      this.latestRelease.name,
+      this.latestRelease.tag_name,
     )
     this.dir = dir
 

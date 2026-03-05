@@ -1,0 +1,58 @@
+_schema-version: 3.3.0
+ID: rfc-<deployment-name>
+version: "<app-version>"
+modules:
+  - name: sap-rfc-connector
+    type: java.tomcat
+    path: target/rfc-<app-version>.war
+    properties:
+      JBP_CONFIG_SAP_MACHINE_JRE: '{ version: 21.+ }'
+      LOGGING_LEVEL_COM_SAP_CLOUD_SDK: DEBUG # any of TRACE, DEBUG, INFO, WARN, ERROR, OFF
+      LOGGING_LEVEL_COM_SAP_CORE_CONNECTIVITY_JCO: DEBUG # any of TRACE, DEBUG, INFO, WARN, ERROR, OFF
+      LOGGING_LEVEL_IO_CAMUNDA_CONNECTOR_SAP_RFC: DEBUG # any of TRACE, DEBUG, INFO, WARN, ERROR, OFF
+      LOGGING_LEVEL_ROOT: WARN # any of TRACE, DEBUG, INFO, WARN, ERROR, OFF
+      SPRING_PROFILES_ACTIVE: cloud
+      USE_JCO: true
+      ZEEBE_CLIENT_CLOUD_REGION: <region-id>
+      ZEEBE_CLIENT_CLOUD_CLUSTERID: <cluster-id>
+      ZEEBE_CLIENT_CLOUD_CLIENTID: <client-id>
+      ZEEBE_CLIENT_CLOUD_CLIENTSECRET: <client-secret>
+      # CAMUNDA_CLIENT_ZEEBE_PREFERRESTOVERGRPC: true
+      CAMUNDA_CONNECTOR_POLLING_ENABLED: false
+      CAMUNDA_CONNECTOR_WEBHOOK_ENABLED: false
+      CAMUNDA_CONNECTOR_SECRETPROVIDER_CONSOLE_ENABLED: true
+    requires:
+      - name: uaa-<deployment-name>
+      - name: dest-<deployment-name>
+      - name: conn-<deployment-name>
+    parameters:
+      buildpack: sap_java_buildpack_jakarta
+      disk-quota: 2G
+      enable-ssh: true
+      memory: 1G
+      readiness-health-check-http-endpoint: /actuator/health
+      readiness-health-check-type: http
+      routes:
+        - protocol: http2
+          route: ${default-uri}
+resources:
+  - name: uaa-<deployment-name>
+    type: org.cloudfoundry.managed-service
+    parameters:
+      config:
+        tenant-mode: dedicated
+        xsappname: rfc-<deployment-name>
+      service: xsuaa
+      service-plan: application
+  - name: dest-<deployment-name>
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: destination
+      service-plan: lite
+  - name: conn-<deployment-name>
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: connectivity
+      service-plan: lite
+parameters:
+  enable-parallel-deployments: true

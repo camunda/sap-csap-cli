@@ -3,20 +3,16 @@ import { setupCommand } from "./commands/setup.ts"
 
 console.log(
   `
-Welcome to csap - Camunda’s SAP Integration CLI`,
-)
-console.log(
-  "https://docs.camunda.io/docs/components/camunda-integrations/sap/csap-cli/",
-)
-console.log(
-  ` 
+Welcome to csap - Camunda’s SAP Integration CLI
+
+https://docs.camunda.io/docs/components/camunda-integrations/sap/csap-cli/
+
   __      __   _   ___ 
  / _| __ / _| / \\ | o \\
 | |_  __ \\_ \\| o ||  _/
  \\__|    |__/|_n_||_|  
                                  
-`,
-)
+`)
 
 yargs(Deno.args)
   .wrap(null)

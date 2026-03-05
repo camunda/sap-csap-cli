@@ -27,11 +27,7 @@ export async function btpPlugin(
   )
 
   if (!directoryExists) {
-    const isWindows = Deno.env.get("OS")?.toLowerCase().includes("windows") ??
-      false
-    if (!isWindows) {
-      await Deno.mkdir(to, { recursive: true })
-    }
+    await Deno.mkdir(to, { recursive: true })
     await _clone(to, btpPluginBranch)
   } else {
     console.log(`i target directory ${to} already exists`)
@@ -48,7 +44,7 @@ export async function btpPlugin(
     } else if (await previousBuildExists(to)) {
       await resetRepo("target directory contains previous build artifacts")
     } else {
-      console.log("✓ repository integrity validated - continuing")
+      console.log("✔ repository integrity validated - continuing")
     }
   }
 
@@ -241,6 +237,7 @@ function _replace(
 function buildCore() {
   const cmd = new Deno.Command("npm", {
     args: ["run", "build", "-w", "core"],
+    env: Deno.env.toObject(),
   })
 
   const { code, stderr, stdout } = cmd.outputSync()
@@ -252,8 +249,8 @@ function buildCore() {
     )
     Deno.exit(code)
   } else {
-    console.log(new TextDecoder().decode(stdout)),
-      console.log("✓ backend build finished")
+    console.log(new TextDecoder().decode(stdout))
+    console.log("✓ backend build finished")
   }
 }
 

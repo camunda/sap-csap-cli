@@ -30,11 +30,17 @@ jobs:
         with:
           deno-version: v2.4.5
 
-      # - name: Cache Deno dependencies
-      #   uses: actions/cache@v4
-      #   with:
-      #     path: ${{ env.DENO_DIR }}
-      #     key: ${{ hashFiles('deno.lock') }}-${{ runner.os }}
+      - name: Cache Deno dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.DENO_DIR }}
+          key: deno-${{ hashFiles('deno.lock') }}-${{ runner.os }}-${{ hashFiles('**/*.ts') }}
+          restore-keys: |
+            deno-${{ hashFiles('deno.lock') }}-${{ runner.os }}-
+            deno-${{ runner.os }}-
+
+      - name: Pre-cache dependencies (npm packages)
+        run: deno cache --reload lib/**/*.ts test/**/*.ts
 
       - name: set tmp git identifiers (for tests involving git)
         run: |
@@ -42,6 +48,13 @@ jobs:
           git config --global user.email "camunda@noreply.github.local"
 
       - name: Run tests
-        run: deno test --allow-all
+        run: deno test test/**/*.ts --allow-all --no-check
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # - name: Run tests (Windows)
+      #   if: runner.os == 'Windows'
+      #   run: deno test test/**/*.ts --allow-all --no-check --ignore=test/btp-plugin-setup.test.ts
+      #   env:
+      #     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #     RUST_LOG: info

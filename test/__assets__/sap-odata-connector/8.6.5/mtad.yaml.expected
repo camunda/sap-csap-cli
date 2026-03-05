@@ -1,0 +1,38 @@
+_schema-version: 3.3.0
+ID: sap-odata-connector-8.6.5
+version: 8.6.5
+modules:
+  - name: sap-odata-connector-8.6.5
+    type: application
+    properties:
+      ZEEBE_CLIENT_CLOUD_REGION: bru-2
+      ZEEBE_CLIENT_CLOUD_CLUSTERID: xxx
+      ZEEBE_CLIENT_CLOUD_CLIENTID: yyy
+      ZEEBE_CLIENT_CLOUD_CLIENTSECRET: zzz
+      CAMUNDA_CONNECTOR_POLLING_ENABLED: false
+      CAMUNDA_CONNECTOR_WEBHOOK_ENABLED: false
+      CAMUNDA_CONNECTOR_SECRETPROVIDER_CONSOLE_ENABLED: true
+      LOGGING_LEVEL_ROOT: WARN
+      LOGGING_LEVEL_IO_CAMUNDA_CONNECTOR_SAP: DEBUG
+    requires:
+      - name: dest-camunda-odata-connector
+      - name: conn-camunda-odata-connector
+    parameters:
+      disk-quota: 2G
+      docker:
+        image: 'camunda/sap-odata-connector:8.6.5'
+      enable-ssh: true
+      health-check-type: process
+      instances: 1
+      memory: 1G
+resources:
+  - name: dest-camunda-odata-connector
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: destination
+      service-plan: lite
+  - name: conn-camunda-odata-connector
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: connectivity
+      service-plan: lite
