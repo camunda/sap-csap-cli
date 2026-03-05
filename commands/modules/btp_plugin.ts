@@ -176,18 +176,10 @@ async function build(
 }
 
 async function prepBuild() {
-  const isWindows = Deno.env.get("OS")?.toLowerCase().includes("windows") ??
-    false
-  
-  const env = isWindows
-    ? { ...Deno.env.toObject(), NODE_OPTIONS: "--max-old-space-size=4096" }
-    : Deno.env.toObject()
-
   const cmd = new Deno.Command("npm", {
     args: ["i"],
     stdout: "inherit",
     stderr: "inherit",
-    env,
   })
 
   const status = await cmd.spawn().status
@@ -243,16 +235,9 @@ function _replace(
 }
 
 function buildCore() {
-  const isWindows = Deno.env.get("OS")?.toLowerCase().includes("windows") ??
-    false
-  
-  const env = isWindows
-    ? { ...Deno.env.toObject(), NODE_OPTIONS: "--max-old-space-size=4096" }
-    : Deno.env.toObject()
-
   const cmd = new Deno.Command("npm", {
     args: ["run", "build", "-w", "core"],
-    env,
+    env: Deno.env.toObject(),
   })
 
   const { code, stderr, stdout } = cmd.outputSync()
@@ -264,22 +249,14 @@ function buildCore() {
     )
     Deno.exit(code)
   } else {
-    console.log(new TextDecoder().decode(stdout)),
-      console.log("✓ backend build finished")
+    console.log(new TextDecoder().decode(stdout))
+    console.log("✓ backend build finished")
   }
 }
 
 function buildApp() {
-  const isWindows = Deno.env.get("OS")?.toLowerCase().includes("windows") ??
-    false
-  
-  const env = isWindows
-    ? { ...Deno.env.toObject(), NODE_OPTIONS: "--max-old-space-size=4096" }
-    : Deno.env.toObject()
-
   const cmd = new Deno.Command("npm", {
     args: ["run", "build", "-w", "fiori-app"],
-    env,
   })
   const { code, stderr, stdout } = cmd.outputSync()
   if (code !== 0) {
@@ -296,16 +273,8 @@ function buildApp() {
 }
 
 function buildMbt() {
-  const isWindows = Deno.env.get("OS")?.toLowerCase().includes("windows") ??
-    false
-  
-  const env = isWindows
-    ? { ...Deno.env.toObject(), NODE_OPTIONS: "--max-old-space-size=4096" }
-    : Deno.env.toObject()
-
   const cmd = new Deno.Command("npx", {
     args: ["--yes", "mbt", "build"],
-    env,
   })
   const { code, stderr, stdout } = cmd.outputSync()
   if (code !== 0) {
