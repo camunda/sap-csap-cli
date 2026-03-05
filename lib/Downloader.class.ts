@@ -7,6 +7,10 @@ import { Kind } from "./common.ts"
 const octokit = new Octokit({
   userAgent: "csap",
   auth: Deno.env.get("GH_TOKEN"),
+  request: {
+    timeout: 60000, // 30 Sekunden - verhindert lange HTTP/2 Connection Hangs
+    keepAliveTimeout: 30000 // Verbindung länger aktiv halten
+  },
 })
 
 export class Downloader {
