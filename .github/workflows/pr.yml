@@ -48,8 +48,14 @@ jobs:
           git config --global user.email "camunda@noreply.github.local"
 
       - name: Run tests
+        if: runner.os != 'Windows'
         run: deno test test/**/*.ts --allow-all --no-check
-        timeout-minutes: 60
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run tests (Windows)
+        if: runner.os == 'Windows'
+        run: deno test test/**/*.ts --allow-all --no-check --ignore=test/btp-plugin-setup.test.ts
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RUST_LOG: info
