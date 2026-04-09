@@ -130,7 +130,6 @@ async function build(
   console.log("i installing dependencies...")
   await prepBuild()
   console.log("✓ installed dependencies")
-
   console.log("i building backend and frontend...")
   await Promise.all([
     buildCore(), //> essentially cds build --for production
@@ -177,7 +176,7 @@ async function build(
 
 async function prepBuild() {
   const cmd = new Deno.Command("npm", {
-    args: ["i"],
+    args: ["i", "--no-optional"],
     stdout: "inherit",
     stderr: "inherit",
   })

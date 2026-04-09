@@ -36,7 +36,7 @@ async function captureStdout<T>(fn: () => T | Promise<T>): Promise<[T, string]> 
 Deno.test("should return a list of releases", async () => {
   const releases = await new Downloader(
     Kind.odata,
-    "8.6",
+    "8.8",
     Deno.makeTempDirSync(),
   )
     .getReleases()
@@ -44,22 +44,22 @@ Deno.test("should return a list of releases", async () => {
 })
 
 Deno.test("should return the latest release", async () => {
-  const downloader = new Downloader(Kind.rfc, "8.6", Deno.makeTempDirSync(), "rfc")
+  const downloader = new Downloader(Kind.rfc, "8.8", Deno.makeTempDirSync(), "rfc")
   const latestRelease = await downloader.getLatestRelease()
   await new Promise((resolve) => setTimeout(resolve, 100)) //> ...
   assertInstanceOf(latestRelease, Object)
   assertMatch(
     latestRelease.name,
-    /8\.6\.\d+/,
+    /8\.8\.\d+/,
   )
   assertNotEquals(
     latestRelease.name,
-    "8.6.0",
+    "8.8.0",
   )
 })
 
 Deno.test("should download assets for a module", async () => {
-  const downloader = new Downloader(Kind.odata, "8.6", Deno.makeTempDirSync(), "odata")
+  const downloader = new Downloader(Kind.odata, "8.8", Deno.makeTempDirSync(), "odata")
   await downloader.pullAssets()
   const result = []
   for await (const dirEntry of walk(downloader.to)) {

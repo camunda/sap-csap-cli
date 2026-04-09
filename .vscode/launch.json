@@ -83,6 +83,38 @@
     },
     {
       "request": "launch",
+      "name": "deno connector rfc",
+      "type": "node",
+      "cwd": "${workspaceFolder}",
+      "env": {},
+      "runtimeExecutable": "deno",
+      "runtimeArgs": [
+        "run",
+        "--inspect-brk",
+        "--allow-all",
+        "cli.ts",
+        "setup",
+        "--for",
+        "rfc",
+        "--camunda",
+        "8.9",
+        "--region",
+        "bru-2",
+        "--to",
+        "temp",
+        "--clusterId",
+        " ",
+        "--clientId",
+        " ",
+        "--clientSecret",
+        " ",
+        "--deployment",
+        "SaaS"
+      ],
+      "attachSimplePort": 9229
+    },
+    {
+      "request": "launch",
       /* modified: descriptive name */
       "name": "Debug tests",
       /* modified: was generated as "pwa-node", but VS Code shows me

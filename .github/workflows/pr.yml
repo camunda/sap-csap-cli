@@ -39,6 +39,14 @@ jobs:
             deno-${{ hashFiles('deno.lock') }}-${{ runner.os }}-
             deno-${{ runner.os }}-
 
+      - name: Cache npm cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: npm-cache-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            npm-cache-${{ runner.os }}-
+
       - name: Pre-cache dependencies (npm packages)
         run: deno cache --reload lib/**/*.ts test/**/*.ts
 
