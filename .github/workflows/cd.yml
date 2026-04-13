@@ -15,9 +15,6 @@ env:
 jobs:
   test:
     runs-on: ${{ matrix.os }}
-    env:
-      NPM_CONFIG_OPTIONAL: "false"
-      NPM_CONFIG_OMIT: "optional"
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
