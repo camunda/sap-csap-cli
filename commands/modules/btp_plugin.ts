@@ -115,6 +115,13 @@ async function build(
   Deno.copyFileSync("./mta.yaml.example", "./mta.yaml")
   Deno.copyFileSync("./xs-security.json.example", "./xs-security.json")
 
+  // ensure package.json exists in the cloned directory
+  const hasPkg = await Deno.stat(join(inDir, "package.json")).then(() => true).catch(() => false)
+  if (!hasPkg) {
+    console.error(`x package.json not found in ${inDir} — clone may have failed or repository layout changed`)
+    Deno.exit(1)
+  }
+
   const pkgJson = url.pathToFileURL(join(inDir, "package.json")).href
 
   const btpPluginVersion = (await import(pkgJson, {
@@ -130,7 +137,6 @@ async function build(
   console.log("i installing dependencies...")
   await prepBuild()
   console.log("✓ installed dependencies")
-
   console.log("i building backend and frontend...")
   await Promise.all([
     buildCore(), //> essentially cds build --for production
@@ -176,14 +182,30 @@ async function build(
 }
 
 async function prepBuild() {
-  const cmd = new Deno.Command("npm", {
-    args: ["i"],
+  const hasLock = await Deno.stat("package-lock.json").then(() => true).catch(() => false)
+  if (hasLock) {
+    const ci = new Deno.Command("npm", {
+      args: ["ci"],
+      stdout: "inherit",
+      stderr: "inherit",
+    })
+
+    const ciStatus = await ci.spawn().status
+    if (ciStatus.success) {
+      return
+    }
+
+    console.warn("i npm ci failed, retrying with npm install...")
+  }
+
+  const install = new Deno.Command("npm", {
+    args: ["install"],
     stdout: "inherit",
     stderr: "inherit",
   })
 
-  const status = await cmd.spawn().status
-  if (!status.success) {
+  const installStatus = await install.spawn().status
+  if (!installStatus.success) {
     console.error("Error installing dependencies")
     Deno.exit(1)
   }
@@ -255,21 +277,52 @@ function buildCore() {
 }
 
 function buildApp() {
-  const cmd = new Deno.Command("npm", {
+  const runBuild = () => new Deno.Command("npm", {
     args: ["run", "build", "-w", "fiori-app"],
-  })
-  const { code, stderr, stdout } = cmd.outputSync()
+  }).outputSync()
+
+  let { code, stderr, stdout } = runBuild()
+  let stderrText = new TextDecoder().decode(stderr)
+
+  if (code !== 0 && stderrText.includes("Cannot find module @rollup/rollup-")) {
+    const rollupPkg = platformRollupPackage()
+    if (rollupPkg) {
+      console.warn(`i frontend build missing optional rollup binary, installing ${rollupPkg} and retrying...`)
+      const install = new Deno.Command("npm", {
+        args: ["install", "--no-save", rollupPkg],
+        stdout: "inherit",
+        stderr: "inherit",
+      }).outputSync()
+
+      if (install.code === 0) {
+        ({ code, stderr, stdout } = runBuild())
+        stderrText = new TextDecoder().decode(stderr)
+      }
+    }
+  }
+
   if (code !== 0) {
     console.error(
       "%c//> frontend build error",
       "color:red",
-      new TextDecoder().decode(stderr),
+      stderrText,
     )
     Deno.exit(code)
-  } else {
-    console.log(new TextDecoder().decode(stdout))
-    console.log("✓ frontend build finished")
   }
+
+  console.log(new TextDecoder().decode(stdout))
+  console.log("✓ frontend build finished")
+}
+
+function platformRollupPackage(): string | null {
+  const { os, arch } = Deno.build
+  if (os === "darwin" && arch === "aarch64") return "@rollup/rollup-darwin-arm64"
+  if (os === "darwin" && arch === "x86_64") return "@rollup/rollup-darwin-x64"
+  if (os === "linux" && arch === "x86_64") return "@rollup/rollup-linux-x64-gnu"
+  if (os === "linux" && arch === "aarch64") return "@rollup/rollup-linux-arm64-gnu"
+  if (os === "windows" && arch === "x86_64") return "@rollup/rollup-win32-x64-msvc"
+  if (os === "windows" && arch === "aarch64") return "@rollup/rollup-win32-arm64-msvc"
+  return null
 }
 
 function buildMbt() {
