@@ -11,5 +11,5 @@
     "@std/cli": "jsr:@std/cli@~1.0.23",
     "@std/io": "jsr:@std/io@~0.225.2"
   },
-  "version": "1.2.2"
+  "version": "1.2.3"
 }
