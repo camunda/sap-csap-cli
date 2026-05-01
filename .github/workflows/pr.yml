@@ -28,7 +28,7 @@ jobs:
       - name: Set up Deno
         uses: denoland/setup-deno@v2
         with:
-          deno-version: v2.4.5
+          deno-version: 2.7.14
 
       - name: Remove local lockfile to mirror CI
         run: deno eval "try { await Deno.remove('deno.lock') } catch (_) {}"
