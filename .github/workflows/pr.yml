@@ -34,7 +34,7 @@ jobs:
         run: deno eval "try { await Deno.remove('deno.lock') } catch (_) {}"
 
       - name: Cache Deno dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ${{ env.DENO_DIR }}
           key: deno-${{ runner.os }}-${{ hashFiles('deno.json') }}-${{ hashFiles('**/*.ts') }}
@@ -43,7 +43,7 @@ jobs:
             deno-${{ runner.os }}-
 
       - name: Cache npm cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.npm
           key: npm-cache-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
