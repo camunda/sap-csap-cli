@@ -66,7 +66,15 @@ export const Kind = {
 } as const
 
 export function warnIfGithubTokenMissing() {
-  if (Deno.env.get("GH_TOKEN")) {
+  let token: string | undefined
+  try {
+    token = Deno.env.get("GH_TOKEN")
+  } catch (_err) {
+    // Running without --allow-env; don't block CLI startup just to emit a warning.
+    return
+  }
+
+  if (token) {
     return
   }
 
