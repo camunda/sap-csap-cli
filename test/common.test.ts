@@ -1,5 +1,10 @@
-import { assertEquals, assertNotEquals } from "jsr:@std/assert"
-import { getGitCommitHash } from "../lib/common.ts"
+import {
+  assertEquals,
+  assertNotEquals,
+  assertStringIncludes,
+} from "jsr:@std/assert"
+import { stub } from "jsr:@std/testing/mock"
+import { getGitCommitHash, warnIfGithubTokenMissing } from "../lib/common.ts"
 
 Deno.test("getGitCommitHash - valid repository", async () => {
   const tempDir = await Deno.makeTempDir()
@@ -48,4 +53,44 @@ Deno.test("getGitCommitHash - invalid directory", async () => {
   assertEquals(commitHash, null)
 
   await Deno.remove(tempDir, { recursive: true })
+})
+
+Deno.test("warnIfGithubTokenMissing warns when GH_TOKEN is missing", () => {
+  const envStub = stub(
+    Deno.env,
+    "get",
+    (key: string) => key === "GH_TOKEN" ? undefined : Deno.env.get(key),
+  )
+  const warnStub = stub(console, "warn")
+
+  try {
+    warnIfGithubTokenMissing()
+
+    assertEquals(warnStub.calls.length, 1)
+    assertStringIncludes(
+      String(warnStub.calls[0].args[0]),
+      "No GitHub token found",
+    )
+  } finally {
+    warnStub.restore()
+    envStub.restore()
+  }
+})
+
+Deno.test("warnIfGithubTokenMissing stays quiet when GH_TOKEN exists", () => {
+  const envStub = stub(
+    Deno.env,
+    "get",
+    (key: string) => key === "GH_TOKEN" ? "test-token" : Deno.env.get(key),
+  )
+  const warnStub = stub(console, "warn")
+
+  try {
+    warnIfGithubTokenMissing()
+
+    assertEquals(warnStub.calls.length, 0)
+  } finally {
+    warnStub.restore()
+    envStub.restore()
+  }
 })

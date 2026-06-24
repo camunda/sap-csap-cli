@@ -65,6 +65,16 @@ export const Kind = {
   btp: "sap-btp-plugin",
 } as const
 
+export function warnIfGithubTokenMissing() {
+  if (Deno.env.get("GH_TOKEN")) {
+    return
+  }
+
+  console.warn(
+    "! No GitHub token found in environment variable GH_TOKEN. GitHub API requests may be rate-limited during execution.",
+  )
+}
+
 export async function getGitCommitHash(
   directory: string,
 ): Promise<string | null> {
