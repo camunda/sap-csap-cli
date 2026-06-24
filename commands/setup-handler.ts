@@ -4,6 +4,7 @@ const ask = new Ask()
 import {
   camundaDeploymentOptions,
   camundaVersions,
+  createDefaultBtpRoute,
   sapIntegrationModules,
 } from "../lib/common.ts"
 import {
@@ -50,7 +51,7 @@ export async function setupHandler(argv: any) {
           return true
         }
       },
-      default: "camunda-btp-plugin.cfapps.eu10-004.hana.ondemand.com",
+      default: createDefaultBtpRoute(),
     })).btpRoute
     : "n/a"
 
