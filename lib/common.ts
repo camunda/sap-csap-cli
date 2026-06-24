@@ -65,6 +65,11 @@ export const Kind = {
   btp: "sap-btp-plugin",
 } as const
 
+export function createDefaultBtpRoute() {
+  const suffix = crypto.randomUUID().slice(0, 6)
+  return `camunda-btp-plugin-${suffix}.cfapps.eu-10.hana.ondemand.com`
+}
+
 export async function getGitCommitHash(
   directory: string,
 ): Promise<string | null> {
