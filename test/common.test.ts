@@ -56,10 +56,11 @@ Deno.test("getGitCommitHash - invalid directory", async () => {
 })
 
 Deno.test("warnIfGithubTokenMissing warns when GH_TOKEN is missing", () => {
+  const originalEnvGet = Deno.env.get.bind(Deno.env)
   const envStub = stub(
     Deno.env,
     "get",
-    (key: string) => key === "GH_TOKEN" ? undefined : Deno.env.get(key),
+    (key: string) => key === "GH_TOKEN" ? undefined : originalEnvGet(key),
   )
   const warnStub = stub(console, "warn")
 
