@@ -79,10 +79,11 @@ Deno.test("warnIfGithubTokenMissing warns when GH_TOKEN is missing", () => {
 })
 
 Deno.test("warnIfGithubTokenMissing stays quiet when GH_TOKEN exists", () => {
+  const originalEnvGet = Deno.env.get.bind(Deno.env)
   const envStub = stub(
     Deno.env,
     "get",
-    (key: string) => key === "GH_TOKEN" ? "test-token" : Deno.env.get(key),
+    (key: string) => key === "GH_TOKEN" ? "test-token" : originalEnvGet(key),
   )
   const warnStub = stub(console, "warn")
 
