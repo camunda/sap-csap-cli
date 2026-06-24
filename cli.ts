@@ -1,5 +1,6 @@
-import yargs from "https://deno.land/x/yargs/deno.ts"
+import yargs from "yargs"
 import { setupCommand } from "./commands/setup.ts"
+import { warnIfGithubTokenMissing } from "./lib/common.ts"
 
 console.log(
   `
@@ -12,7 +13,10 @@ https://docs.camunda.io/docs/components/camunda-integrations/sap/csap-cli/
 | |_  __ \\_ \\| o ||  _/
  \\__|    |__/|_n_||_|  
                                  
-`)
+`,
+)
+
+warnIfGithubTokenMissing()
 
 yargs(Deno.args)
   .wrap(null)

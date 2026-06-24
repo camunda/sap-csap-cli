@@ -1,4 +1,4 @@
-import { YargsInstance } from "https://deno.land/x/yargs@v17.7.2-deno/build/lib/yargs-factory.js"
+import type { YargsInstance } from "yargs-factory"
 import {
   camundaDeploymentOptions,
   camundaVersions,
