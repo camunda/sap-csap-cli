@@ -1,4 +1,4 @@
-import yargs from "https://deno.land/x/yargs/deno.ts"
+import yargs from "yargs"
 import { setupCommand } from "./commands/setup.ts"
 import { warnIfGithubTokenMissing } from "./lib/common.ts"
 
