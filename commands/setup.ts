@@ -1,4 +1,4 @@
-import { YargsInstance } from "yargs-factory"
+import type { YargsInstance } from "yargs-factory"
 import {
   camundaDeploymentOptions,
   camundaVersions,
