@@ -67,6 +67,9 @@ jobs:
   release:
     needs: test
     runs-on: macos-latest
+    permissions:
+      contents: write  # ncipollo/release-action creates a GitHub release and uploads artifacts
+      id-token: write  # mint GitHub OIDC token for Vault JWT auth
 
     steps:
       - name: Checkout repository
@@ -94,12 +97,13 @@ jobs:
 
       - name: Import Secrets
         id: secrets
-        uses: hashicorp/vault-action@7709c609789c5e27b757a85817483caadbb5939a # v3.3.0
+        uses: hashicorp/vault-action@892a26828f195e65540a40b4768ae4571f51ebfc  # v4.0.0
         with:
           url: ${{ secrets.VAULT_ADDR }}
-          method: approle
-          roleId: ${{ secrets.VAULT_ROLE_ID }}
-          secretId: ${{ secrets.VAULT_SECRET_ID }}
+          method: jwt
+          role: ${{ secrets.VAULT_JWT_ROLE }}
+          path: ${{ secrets.VAULT_JWT_PATH }}
+          jwtGithubAudience: ${{ secrets.VAULT_JWT_AUDIENCE }}
           secrets: |
             secret/data/products/distribution/ci APPLE_CERTIFICATE;
             secret/data/products/distribution/ci APPLE_CERTIFICATE_PASSWORD;
